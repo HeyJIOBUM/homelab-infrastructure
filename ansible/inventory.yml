@@ -1,0 +1,6 @@
+all:
+  hosts:
+    homelab:
+      ansible_host: 212.47.65.0
+      ansible_user: root
+      ansible_private_key_file: ~/.ssh/id_ed25519
