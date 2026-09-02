@@ -1,0 +1,9 @@
+- name: Deploy Vault
+  hosts: all
+  become: yes
+  
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+
+  roles:
+    - role: vault_deploy

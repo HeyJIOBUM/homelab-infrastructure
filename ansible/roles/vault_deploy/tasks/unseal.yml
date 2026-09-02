@@ -1,0 +1,23 @@
+- name: Check if Vault is sealed
+  shell: |
+    docker exec vault vault status -format=json 2>/dev/null | jq -r '.sealed' || echo "true"
+  register: vault_sealed
+  changed_when: false
+  failed_when: false
+
+- name: Unseal Vault with 3 keys
+  shell: |
+    for i in 0 1 2; do
+      KEY=$(jq -r ".unseal_keys_b64[$i]" {{ vault_credentials_file }})
+      docker exec vault vault operator unseal $KEY
+    done
+  when: vault_sealed.stdout == "true"
+
+- name: Wait for Vault to be unsealed
+  shell: |
+    docker exec vault vault status -format=json | jq -r '.sealed'
+  register: seal_status
+  until: seal_status.stdout == "false"
+  retries: 10
+  delay: 2
+  when: vault_sealed.stdout == "true"

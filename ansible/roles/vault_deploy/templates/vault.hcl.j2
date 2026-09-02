@@ -1,0 +1,16 @@
+storage "raft" {
+  path    = "/vault/data"
+  node_id = "vault-1"
+}
+
+listener "tcp" {
+  address     = "0.0.0.0:{{ vault_port }}"
+  tls_disable = {{ vault_tls_disable }}
+}
+
+ui = {{ vault_ui_enabled }}
+
+api_addr     = "http://0.0.0.0:{{ vault_port }}"
+cluster_addr = "http://0.0.0.0:{{ vault_api_port }}"
+
+disable_mlock = {{ vault_disable_mlock | default('true') }}

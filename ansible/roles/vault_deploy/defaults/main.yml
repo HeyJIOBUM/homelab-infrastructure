@@ -1,0 +1,22 @@
+# Dirs
+vault_service_dir: "{{ services_path }}/vault"
+
+vault_config_dir: "{{ vault_service_dir }}/config"
+vault_data_dir: "{{ vault_service_dir }}/data"
+vault_credentials_dir: "{{ vault_service_dir }}/credentials"
+vault_credentials_file: "{{ vault_credentials_dir }}/vault-keys.json"
+vault_root_token_file: "{{ vault_credentials_dir }}/.vault-root-token"
+
+# Vault
+vault_image_tag: 2.1.0
+
+vault_port: 8200
+vault_api_port: 8201
+vault_addr: "http://{{ ansible_host }}:{{ vault_port }}"
+
+vault_tls_disable: "true"
+vault_ui_enabled: "true"
+vault_disable_mlock: "true"
+
+vault_key_shares: 5
+vault_key_threshold: 3

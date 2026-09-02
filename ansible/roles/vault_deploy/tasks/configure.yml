@@ -1,0 +1,34 @@
+- name: Get root token from file
+  slurp:
+    src: "{{ vault_root_token_file }}"
+  register: root_token_data
+
+- name: Set vault token
+  set_fact:
+    vault_token: "{{ root_token_data.content | b64decode | trim }}"
+
+- name: Create admin policy
+  shell: |
+    echo 'path "*" {
+      capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+    }' | docker exec -i -e VAULT_TOKEN={{ vault_token }} vault vault policy write admin -
+  register: result
+  changed_when: "'Successfully uploaded policy' in result.stdout"
+
+- name: Enable KV v2 secret engine
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault secrets enable -path=secret kv-v2
+  register: result
+  changed_when: "'Success' in result.stdout or 'enabled' in result.stdout"
+  failed_when: 
+    - result.rc != 0
+    - "'already in use' not in result.stderr"
+
+- name: Enable AppRole auth method
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault auth enable -path=approle approle
+  register: result
+  changed_when: "'Success' in result.stdout or 'enabled' in result.stdout"
+  failed_when: 
+    - result.rc != 0
+    - "'already in use' not in result.stderr"

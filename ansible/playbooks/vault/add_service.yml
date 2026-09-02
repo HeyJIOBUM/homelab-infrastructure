@@ -1,0 +1,9 @@
+- name: Add service to Vault
+  hosts: all
+  become: yes
+  
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+
+  roles:
+    - role: vault_add_service
