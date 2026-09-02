@@ -1,0 +1,27 @@
+- name: Install Vault
+  include_tasks: 
+    file: install.yml
+    apply:
+      tags: vault-install
+  tags: vault-install
+
+- name: Initialize Vault
+  include_tasks: 
+    file: init.yml
+    apply:
+      tags: vault-init
+  tags: vault-init
+
+- name: Unseal Vault
+  include_tasks: 
+    file: unseal.yml
+    apply:
+      tags: vault-unseal
+  tags: vault-unseal
+
+- name: Configure Vault
+  include_tasks: 
+    file: configure.yml
+    apply:
+      tags: vault-configure
+  tags: vault-configure

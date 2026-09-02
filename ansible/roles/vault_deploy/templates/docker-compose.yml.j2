@@ -1,0 +1,22 @@
+services:
+  vault:
+    image: hashicorp/vault:{{ vault_image_tag }}
+    container_name: vault
+    restart: unless-stopped
+    
+    cap_add:
+      - IPC_LOCK
+    
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:{{ vault_port }}
+      - VAULT_CLUSTER_ADDR=http://127.0.0.1:{{ vault_api_port }}
+      - VAULT_SKIP_VERIFY=true
+    
+    ports:
+      - "{{ vault_port }}:{{ vault_port }}"
+    
+    volumes:
+      - {{ vault_config_dir }}:/vault/config:ro
+      - {{ vault_data_dir }}:/vault/data
+    
+    command: server

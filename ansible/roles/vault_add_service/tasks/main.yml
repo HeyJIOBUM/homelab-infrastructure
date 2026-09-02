@@ -1,0 +1,77 @@
+- name: Get root token
+  slurp:
+    src: "{{ vault_root_token_file }}"
+  register: root_token_data
+
+- name: Set vault token
+  set_fact:
+    vault_token: "{{ root_token_data.content | b64decode | trim }}"
+
+- name: Create policy for service (all environments)
+  shell: |
+    echo '{{ service_policy_rules }}' | docker exec -i -e VAULT_TOKEN={{ vault_token }} vault vault policy write {{ service_name }} -
+  vars:
+    service_policy_rules: |
+      {% for env in service_envs %}
+      # {{ env }} environment
+      path "secret/data/{{ env }}/{{ service_name }}/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      {% endfor %}
+      
+      # Shared secrets
+      path "secret/data/{{ service_name }}/*" {
+        capabilities = ["read", "list"]
+      }
+      
+      # Token renewal
+      path "auth/token/renew-self" {
+        capabilities = ["update"]
+      }
+  register: result
+  changed_when: "'Success' in result.stdout"
+
+- name: Create AppRole for service
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault write auth/approle/role/{{ service_name }} \
+      secret_id_ttl={{ service_secret_ttl }} \
+      token_ttl={{ service_token_ttl }} \
+      token_max_ttl={{ service_token_max_ttl }} \
+      policies={{ service_name }}
+  register: result
+  changed_when: "'Success' in result.stdout or 'created' in result.stdout"
+
+- name: Get Role ID for service
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault read -field=role_id auth/approle/role/{{ service_name }}/role-id
+  register: role_id_result
+  changed_when: false
+
+- name: Get Secret ID for service
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault write -f -field=secret_id auth/approle/role/{{ service_name }}/secret-id
+  register: secret_id_result
+  changed_when: false
+
+- name: Create credentials directory
+  file:
+    path: "{{ vault_credentials_dir }}"
+    state: directory
+    mode: 0755
+
+- name: Save credentials
+  copy:
+    content: |
+      # Vault AppRole credentials for {{ service_name }}
+      # Generated: {{ ansible_facts.date_time.iso8601 }}
+      # Environments: {{ service_envs | join(', ') }}
+      
+      VAULT_ADDR=http://localhost:{{ vault_port | default('8200') }}
+      VAULT_ROLE_ID={{ role_id_result.stdout }}
+      VAULT_SECRET_ID={{ secret_id_result.stdout }}
+      
+      # Usage:
+      # source {{ vault_credentials_dir }}/{{ service_name }}.env
+      # vault write auth/approle/login role_id="$VAULT_ROLE_ID" secret_id="$VAULT_SECRET_ID"
+    dest: "{{ vault_credentials_dir }}/{{ service_name }}.env"
+    mode: 0600

@@ -1,0 +1,16 @@
+# Dirs
+vault_service_dir: "{{ services_path }}/vault"
+vault_credentials_dir: "{{ vault_service_dir }}/credentials"
+vault_root_token_file: "{{ vault_credentials_dir }}/.vault-root-token"
+
+# Vault
+vault_port: 8200
+vault_addr: "http://{{ ansible_host }}:{{ vault_port }}"
+
+# Secret
+service_secret_ttl: "8760h"
+service_token_ttl: "1h"
+service_token_max_ttl: "4h"
+
+service_envs: ["dev", "server"] 
+service_name: "test"
