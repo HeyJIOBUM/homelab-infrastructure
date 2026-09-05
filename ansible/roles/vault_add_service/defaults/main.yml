@@ -6,6 +6,7 @@ vault_root_token_file: "{{ vault_credentials_dir }}/.vault-root-token"
 # Vault
 vault_port: 8200
 vault_addr: "http://{{ ansible_host }}:{{ vault_port }}"
+vault_kv_engine: "secret"
 
 # Secret
 service_secret_ttl: "8760h"

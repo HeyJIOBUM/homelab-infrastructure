@@ -13,6 +13,7 @@ vault_image_tag: 2.1.0
 vault_port: 8200
 vault_api_port: 8201
 vault_addr: "http://{{ ansible_host }}:{{ vault_port }}"
+vault_kv_engine: "secret"
 
 vault_tls_disable: "true"
 vault_ui_enabled: "true"

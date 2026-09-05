@@ -17,7 +17,7 @@
 
 - name: Enable KV v2 secret engine
   shell: |
-    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault secrets enable -path=secret kv-v2
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault secrets enable -path={{ vault_kv_engine }} kv-v2
   register: result
   changed_when: "'Success' in result.stdout or 'enabled' in result.stdout"
   failed_when: 

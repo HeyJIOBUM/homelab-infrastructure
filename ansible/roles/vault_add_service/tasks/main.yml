@@ -14,13 +14,13 @@
     service_policy_rules: |
       {% for env in service_envs %}
       # {{ env }} environment
-      path "secret/data/{{ env }}/{{ service_name }}/*" {
+      path "{{ vault_kv_engine }}/data/{{ env }}/{{ service_name }}/*" {
         capabilities = ["create", "read", "update", "delete", "list"]
       }
       {% endfor %}
       
       # Shared secrets
-      path "secret/data/{{ service_name }}/*" {
+      path "{{ vault_kv_engine }}/data/{{ service_name }}/*" {
         capabilities = ["read", "list"]
       }
       
