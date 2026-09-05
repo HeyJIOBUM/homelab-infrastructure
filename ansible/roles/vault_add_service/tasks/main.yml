@@ -41,6 +41,13 @@
   register: result
   changed_when: "'Success' in result.stdout or 'created' in result.stdout"
 
+- name: Create test_secret in all environments
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault kv put secret/{{ item }}/{{ service_name }} test_secret="test_value_{{ item }}"
+  loop: "{{ service_envs }}"
+  register: secret_result
+  changed_when: "'success' in secret_result.stdout or 'Success' in secret_result.stdout"
+
 - name: Get Role ID for service
   shell: |
     docker exec -e VAULT_TOKEN={{ vault_token }} vault vault read -field=role_id auth/approle/role/{{ service_name }}/role-id
