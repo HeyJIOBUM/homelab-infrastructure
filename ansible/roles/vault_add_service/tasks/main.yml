@@ -43,10 +43,10 @@
 
 - name: Create test_secret in all environments
   shell: |
-    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault kv put secret/{{ item }}/{{ service_name }} test_secret="test_value_{{ item }}"
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault kv put -format=json {{ vault_kv_engine }}/{{ item }}/{{ service_name }} \
+      test_secret="test_value_{{ item }}"
   loop: "{{ service_envs }}"
   register: secret_result
-  changed_when: "'success' in secret_result.stdout or 'Success' in secret_result.stdout"
 
 - name: Get Role ID for service
   shell: |
@@ -73,12 +73,18 @@
       # Generated: {{ ansible_facts.date_time.iso8601 }}
       # Environments: {{ service_envs | join(', ') }}
       
-      VAULT_ADDR=http://localhost:{{ vault_port | default('8200') }}
-      VAULT_ROLE_ID={{ role_id_result.stdout }}
-      VAULT_SECRET_ID={{ secret_id_result.stdout }}
+      # Vault connection settings
+      VAULT_ADDR="http://{{ ansible_host }}:{{ vault_port }}"
+      VAULT_ROLE_ID="{{ role_id_result.stdout }}"
+      VAULT_SECRET_ID="{{ secret_id_result.stdout }}"
       
+      # Vault paths
+      VAULT_KV_ENGINE="{{ vault_kv_engine }}"
+      VAULT_SECRET_PATH="{{ vault_kv_engine }}/data/$APP_ENV/{{ service_name }}"
+
       # Usage:
-      # source {{ vault_credentials_dir }}/{{ service_name }}.env
+      # APP_ENV must be set before using this file
+      # Example: APP_ENV=prod source {{ vault_credentials_dir }}/{{ service_name }}.env
       # vault write auth/approle/login role_id="$VAULT_ROLE_ID" secret_id="$VAULT_SECRET_ID"
     dest: "{{ vault_credentials_dir }}/{{ service_name }}.env"
     mode: 0600
