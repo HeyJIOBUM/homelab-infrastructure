@@ -14,7 +14,7 @@
     service_policy_rules: |
       {% for env in service_envs %}
       # {{ env }} environment
-      path "{{ vault_kv_engine }}/data/{{ env }}/{{ service_name }}/*" {
+      path "{{ vault_kv_engine }}/data/{{ env }}/{{ service_name }}" {
         capabilities = ["create", "read", "update", "delete", "list"]
       }
       {% endfor %}
