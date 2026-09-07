@@ -66,12 +66,12 @@
     state: directory
     mode: 0755
 
-- name: Save credentials
+- name: Save credentials for each environment
   copy:
     content: |
       # Vault AppRole credentials for {{ service_name }}
+      # Environment: {{ item }}
       # Generated: {{ ansible_facts.date_time.iso8601 }}
-      # Environments: {{ service_envs | join(', ') }}
       
       # Vault connection settings
       VAULT_ADDR="http://{{ ansible_host }}:{{ vault_port }}"
@@ -80,11 +80,12 @@
       
       # Vault paths
       VAULT_KV_ENGINE="{{ vault_kv_engine }}"
-      VAULT_SECRET_PATH="{{ vault_kv_engine }}/data/$APP_ENV/{{ service_name }}"
-
+      VAULT_SECRET_PATH="{{ vault_kv_engine }}/data/{{ item }}/{{ service_name }}"
+      VAULT_APPROLE_MOUNT="approle"
+      
       # Usage:
-      # APP_ENV must be set before using this file
-      # Example: APP_ENV=prod source {{ vault_credentials_dir }}/{{ service_name }}.env
+      # source {{ vault_credentials_dir }}/{{ service_name }}.{{ item }}.env
       # vault write auth/approle/login role_id="$VAULT_ROLE_ID" secret_id="$VAULT_SECRET_ID"
-    dest: "{{ vault_credentials_dir }}/{{ service_name }}.env"
+    dest: "{{ vault_credentials_dir }}/{{ service_name }}.{{ item }}.env"
     mode: 0600
+  loop: "{{ service_envs }}"
