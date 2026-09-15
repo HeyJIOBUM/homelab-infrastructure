@@ -5,5 +5,8 @@
   environment:
     VAULT_ADDR: "{{ vault_addr }}"
 
+  vars_files:
+    - vault_vars.yml
+
   roles:
     - role: vault_deploy
