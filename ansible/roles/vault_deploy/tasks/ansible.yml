@@ -87,5 +87,5 @@
       vault_role_id:       "{{ ansible_role_id.stdout }}"
       vault_secret_id:     "{{ ansible_secret_id.stdout }}"
       vault_approle_mount: "approle"
-    dest: "{{ vault_credentials_dir }}/ansible.yml"
+    dest: "{{ vault_ansible_token_file }}"
     mode: "0600"
