@@ -1,0 +1,82 @@
+- name: Create admin policy for Ansible
+  shell: |
+    echo '{{ ansible_admin_policy }}' | \
+      docker exec -i -e VAULT_TOKEN={{ vault_token }} vault \
+      vault policy write ansible-admin -
+  vars:
+    ansible_admin_policy: |
+      # policies
+      path "sys/policies/acl/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+
+      # approle
+      path "auth/approle/role/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "auth/approle/role/*/role-id" {
+        capabilities = ["read"]
+      }
+      path "auth/approle/role/*/secret-id" {
+        capabilities = ["create", "update"]
+      }
+
+      # secrets
+      path "{{ vault_kv_engine }}/data/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "{{ vault_kv_engine }}/metadata/*" {
+        capabilities = ["read", "list", "delete"]
+      }
+
+      # self token renew
+      path "auth/token/renew-self" {
+        capabilities = ["update"]
+      }
+      path "auth/token/lookup-self" {
+        capabilities = ["read"]
+      }
+  register: ansible_policy
+  changed_when: "'Success' in ansible_policy.stdout"
+
+- name: Create AppRole for Ansible
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault write auth/approle/role/ansible \
+      secret_id_ttl={{ ansible_secret_id_ttl }} \
+      token_ttl={{ ansible_token_ttl }} \
+      token_max_ttl={{ ansible_token_max_ttl }} \
+      policies=ansible-admin
+  register: ansible_approle
+  changed_when: "'Success' in ansible_approle.stdout or 'created' in ansible_approle.stdout"
+
+- name: Get Ansible Role ID
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault read -field=role_id auth/approle/role/ansible/role-id
+  register: ansible_role_id
+  changed_when: false
+
+- name: Get Ansible Secret ID
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault write -f -field=secret_id auth/approle/role/ansible/secret-id
+  register: ansible_secret_id
+  changed_when: false
+
+- name: Save Ansible AppRole credentials
+  copy:
+    content: |
+      # Ansible AppRole credentials
+      # Generated: {{ ansible_facts.date_time.iso8601 }}
+      #
+      # Next:
+      # - encrypt with ansible
+      # - copy to repo
+      # - remove from server
+      vault_addr:          "{{ vault_addr }}"
+      vault_role_id:       "{{ ansible_role_id.stdout }}"
+      vault_secret_id:     "{{ ansible_secret_id.stdout }}"
+      vault_approle_mount: "approle"
+    dest: "{{ vault_credentials_dir }}/ansible.yml"
+    mode: "0600"

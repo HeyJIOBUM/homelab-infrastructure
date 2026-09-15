@@ -25,3 +25,10 @@
     apply:
       tags: vault-configure
   tags: vault-configure
+
+- name: Create ansible token
+  include_tasks: 
+    file: ansible.yml
+    apply:
+      tags: vault-ansible
+  tags: vault-ansible
