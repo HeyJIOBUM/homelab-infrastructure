@@ -7,57 +7,74 @@
   set_fact:
     vault_token: "{{ root_token_data.content | b64decode | trim }}"
 
-- name: Create policy for service (all environments)
+- name: Create policy for service in each environment
   shell: |
-    echo '{{ service_policy_rules }}' | docker exec -i -e VAULT_TOKEN={{ vault_token }} vault vault policy write {{ service_name }} -
+    echo '{{ service_policy_rules }}' | \
+      docker exec -i -e VAULT_TOKEN={{ vault_token }} vault \
+      vault policy write {{ service_name }}-{{ item }} -
   vars:
     service_policy_rules: |
-      {% for env in service_envs %}
-      # {{ env }} environment
-      path "{{ vault_kv_engine }}/data/{{ env }}/{{ service_name }}" {
+      # {{ item }} environment only
+      path "{{ vault_kv_engine }}/data/{{ item }}/services/{{ service_name }}/*" {
         capabilities = ["create", "read", "update", "delete", "list"]
       }
-      {% endfor %}
-      
-      # Shared secrets
-      path "{{ vault_kv_engine }}/data/{{ service_name }}/*" {
+      path "{{ vault_kv_engine }}/metadata/{{ item }}/services/{{ service_name }}/*" {
         capabilities = ["read", "list"]
       }
-      
+
       # Token renewal
       path "auth/token/renew-self" {
         capabilities = ["update"]
       }
-  register: result
-  changed_when: "'Success' in result.stdout"
+  loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ service_name }}-{{ item }}"
+  register: policy_result
+  changed_when: "'Success' in policy_result.stdout"
 
-- name: Create AppRole for service
+- name: Create AppRole for service in each environment
   shell: |
-    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault write auth/approle/role/{{ service_name }} \
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault write auth/approle/role/{{ service_name }}-{{ item }} \
       secret_id_ttl={{ service_secret_ttl }} \
       token_ttl={{ service_token_ttl }} \
       token_max_ttl={{ service_token_max_ttl }} \
-      policies={{ service_name }}
-  register: result
-  changed_when: "'Success' in result.stdout or 'created' in result.stdout"
-
-- name: Create test_secret in all environments
-  shell: |
-    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault kv put -format=json {{ vault_kv_engine }}/{{ item }}/{{ service_name }} \
-      test_secret="test_value_{{ item }}"
+      policies={{ service_name }}-{{ item }}
   loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ service_name }}-{{ item }}"
+  register: approle_result
+  changed_when: "'Success' in approle_result.stdout or 'created' in approle_result.stdout"
+
+- name: Initialize service path in Vault
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault kv put -format=json {{ vault_kv_engine }}/{{ item }}/services/{{ service_name }} \
+      service_name="{{ service_name }}" \
+      environment="{{ item }}"
+  loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ item }}/services/{{ service_name }}"
   register: secret_result
 
-- name: Get Role ID for service
+- name: Get Role ID for service in each environment
   shell: |
-    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault read -field=role_id auth/approle/role/{{ service_name }}/role-id
-  register: role_id_result
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault read -field=role_id auth/approle/role/{{ service_name }}-{{ item }}/role-id
+  loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ service_name }}-{{ item }}"
+  register: role_id_results
   changed_when: false
 
-- name: Get Secret ID for service
+- name: Get Secret ID for service in each environment
   shell: |
-    docker exec -e VAULT_TOKEN={{ vault_token }} vault vault write -f -field=secret_id auth/approle/role/{{ service_name }}/secret-id
-  register: secret_id_result
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault write -f -field=secret_id auth/approle/role/{{ service_name }}-{{ item }}/secret-id
+  loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ service_name }}-{{ item }}"
+  register: secret_id_results
   changed_when: false
 
 - name: Create credentials directory
@@ -72,20 +89,22 @@
       # Vault AppRole credentials for {{ service_name }}
       # Environment: {{ item }}
       # Generated: {{ ansible_facts.date_time.iso8601 }}
-      
+
       # Vault connection settings
       VAULT_ADDR="http://{{ ansible_host }}:{{ vault_port }}"
-      VAULT_ROLE_ID="{{ role_id_result.stdout }}"
-      VAULT_SECRET_ID="{{ secret_id_result.stdout }}"
-      
+      VAULT_ROLE_ID="{{ role_id_results.results[ansible_loop.index0].stdout }}"
+      VAULT_SECRET_ID="{{ secret_id_results.results[ansible_loop.index0].stdout }}"
+      VAULT_APPROLE_MOUNT="approle"
+
       # Vault paths
       VAULT_KV_ENGINE="{{ vault_kv_engine }}"
-      VAULT_SECRET_PATH="{{ vault_kv_engine }}/data/{{ item }}/{{ service_name }}"
-      VAULT_APPROLE_MOUNT="approle"
-      
+      VAULT_SECRET_PATH="{{ vault_kv_engine }}/data/{{ item }}/services/{{ service_name }}"
+
       # Usage:
       # source {{ vault_credentials_dir }}/{{ service_name }}.{{ item }}.env
       # vault write auth/approle/login role_id="$VAULT_ROLE_ID" secret_id="$VAULT_SECRET_ID"
     dest: "{{ vault_credentials_dir }}/{{ service_name }}.{{ item }}.env"
-    mode: 0600
+    mode: "0600"
   loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ service_name }}.{{ item }}.env"
