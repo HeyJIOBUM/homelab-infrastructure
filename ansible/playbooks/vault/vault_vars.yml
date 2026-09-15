@@ -28,6 +28,9 @@ service_secret_ttl: "8760h"
 service_token_ttl: "1h"
 service_token_max_ttl: "4h"
 
+ansible_secret_id_ttl: "8760h"
+ansible_token_ttl: "1h"
+ansible_token_max_ttl: "4h"
 # service
 service_envs: ["dev", "server"] 
 # must be set with -e "service_name=test"
