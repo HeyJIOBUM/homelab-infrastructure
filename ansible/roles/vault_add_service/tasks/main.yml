@@ -92,19 +92,20 @@
 
       # Vault connection settings
       VAULT_ADDR="{{ vault_addr }}"
-      VAULT_ROLE_ID="{{ role_id_results.results[ansible_loop.index0].stdout }}"
-      VAULT_SECRET_ID="{{ secret_id_results.results[ansible_loop.index0].stdout }}"
+      VAULT_ROLE_ID="{{ role_id_results.results[idx].stdout }}"
+      VAULT_SECRET_ID="{{ secret_id_results.results[idx].stdout }}"
       VAULT_APPROLE_MOUNT="approle"
 
       # Vault paths
       VAULT_KV_ENGINE="{{ vault_kv_engine }}"
-      VAULT_SECRET_PATH="{{ vault_kv_engine }}/data/{{ item }}/services/{{ service_name }}"
+      VAULT_SECRET_MOUNT_PATH="{{ vault_kv_engine }}/data/{{ item }}"
+      VAULT_SECRET_SERVICE_PATH="$services/{{ service_name }}"
 
       # Usage:
       # source {{ vault_credentials_dir }}/{{ service_name }}.{{ item }}.env
-      # vault write auth/approle/login role_id="$VAULT_ROLE_ID" secret_id="$VAULT_SECRET_ID"
     dest: "{{ vault_credentials_dir }}/{{ service_name }}.{{ item }}.env"
     mode: "0600"
   loop: "{{ service_envs }}"
   loop_control:
+    index_var: idx
     label: "{{ service_name }}.{{ item }}.env"
