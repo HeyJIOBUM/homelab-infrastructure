@@ -1,0 +1,66 @@
+# Dirs
+garage_service_dir: "{{ services_path }}/garage"
+garage_config_dir: "{{ garage_service_dir }}/config"
+garage_data_dir: "{{ garage_service_dir }}/data"
+garage_meta_dir: "{{ garage_service_dir }}/meta"
+garage_credentials_dir: "{{ garage_service_dir }}/credentials"
+
+garage_admin_token_file: "{{ garage_credentials_dir }}/.garage-admin-token"
+garage_rpc_secret_file: "{{ garage_credentials_dir }}/.garage-rpc-secret"
+
+# Image
+garage_image_tag: "v2.4.1"
+
+# Ports
+garage_s3_port: 3900
+garage_rpc_port: 3901
+garage_web_port: 3902
+garage_admin_port: 3903
+garage_ui_port: 3909
+
+# Addresses
+garage_s3_endpoint: "http://{{ ansible_host }}:{{ garage_s3_port }}"
+garage_api_url: "http://{{ ansible_host }}:{{ garage_admin_port }}"
+garage_s3_region: "garage"
+
+# Single-node
+garage_replication_factor: 1
+garage_node_capacity: 5Gi
+garage_node_zone: dc1
+
+# vault
+garage_vault_path: infra/garage
+
+# service
+service_envs: ["dev", "server"] 
+
+#---------------------------------------------------------
+# UI image
+garage_ui_image_tag: "latest"
+
+# internal UI port
+garage_ui_internal_port: 8080
+
+# UI region
+garage_ui_s3_region: "{{ garage_s3_region }}"
+
+# UI environment
+garage_ui_environment: "production"
+
+# UI admin credentials
+garage_ui_admin_enabled: false
+garage_ui_admin_username: "admin"
+garage_ui_admin_password: "changeme"
+
+# UI token auth
+garage_ui_token_enabled: true
+
+# UI JWT private key
+garage_ui_jwt_private_key: ""
+
+# UI logging
+garage_ui_log_level: "info"
+garage_ui_log_format: "text"
+
+# UI CORS
+garage_ui_cors_origins: ["*"]

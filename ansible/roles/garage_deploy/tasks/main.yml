@@ -1,0 +1,23 @@
+- name: Login to vault
+  include_role:
+    name: vault_login
+  tags: always
+
+- name: Get garage secrets
+  include_role:
+    name: garage_read_secrets
+  tags: always
+
+- name: Install garage
+  include_tasks:
+    file: install.yml
+    apply:
+      tags: garage-install
+  tags: garage-install
+
+- name: Initialize garage layout
+  include_tasks:
+    file: init.yml
+    apply:
+      tags: garage-init
+  tags: garage-init

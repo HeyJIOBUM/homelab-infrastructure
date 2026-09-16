@@ -1,0 +1,4 @@
+- name: restart garage container
+  community.docker.docker_compose_v2:
+    project_src: "{{ garage_service_dir }}"
+    state: restarted

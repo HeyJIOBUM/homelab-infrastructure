@@ -1,0 +1,29 @@
+- name: Check if garage layout is initialized
+  uri:
+    url: "{{ garage_api_url }}/v2/GetClusterHealth"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ garage_admin_token }}"
+    status_code: [200, 503]
+  register: garage_health
+  failed_when: false
+  changed_when: false
+
+- name: Get garage node ID
+  shell: |
+    docker exec garage /garage node id -q | cut -d'@' -f1
+  register: garage_node_id
+  changed_when: false
+  when: garage_health.json.storageNodes | default(0) == 0
+
+- name: Assign garage node to layout
+  shell: |
+    docker exec garage /garage layout assign -z {{ garage_node_zone }} -c {{ garage_node_capacity }} {{ garage_node_id.stdout }}
+  register: layout_assign
+  when: garage_health.json.storageNodes | default(0) == 0
+
+- name: Apply garage layout
+  shell: |
+    docker exec garage /garage layout apply --version 1
+  register: layout_apply
+  when: garage_health.json.storageNodes | default(0) == 0

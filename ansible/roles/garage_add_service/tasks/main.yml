@@ -1,0 +1,62 @@
+- name: Login to vault
+  include_role:
+    name: vault_login
+
+- name: Get garage secrets
+  include_role:
+    name: garage_read_secrets
+
+- name: Create S3 access key for {{ service_name }}
+  occ_automation.garage.garage_key:
+    api_url: "{{ garage_api_url }}"
+    api_token: "{{ garage_admin_token }}"
+    name: "{{ service_name }}-{{ item }}-key"
+    allow_create_bucket: false
+  register: garage_s3_key_results
+  loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ service_name }}-{{ item }}"
+
+- name: Create S3 bucket for {{ service_name }}
+  occ_automation.garage.garage_bucket:
+    api_url: "{{ garage_api_url }}"
+    api_token: "{{ garage_admin_token }}"
+    name: "{{ service_name }}-{{ item }}"
+  register: garage_bucket_results
+  loop: "{{ service_envs }}"
+  loop_control:
+    label: "{{ service_name }}-{{ item }}"
+
+- name: Grant key access to the bucket
+  occ_automation.garage.garage_bucket_key:
+    api_url: "{{ garage_api_url }}"
+    api_token: "{{ garage_admin_token }}"
+    bucket_alias: "{{ garage_bucket_results.results[idx].bucket.global_aliases[0] }}"
+    access_key_id: "{{ garage_s3_key_results.results[idx].key.access_key_id }}"
+    read: true
+    write: true
+    owner: false
+  loop: "{{ service_envs }}"
+  loop_control:
+    index_var: idx
+    label: "{{ service_name }}-{{ item }}"
+
+- name: Save S3 credentials to Vault
+  community.hashi_vault.vault_kv2_write:
+    url: "{{ vault_addr }}"
+    token: "{{ vault_token }}"
+    engine_mount_point: "{{ vault_kv_engine }}"
+    path: "{{ item }}/services/{{ service_name }}/garage"
+    data:
+      access_key_id: "{{ garage_s3_key_results.results[idx].key.access_key_id }}"
+      secret_access_key: "{{ garage_s3_key_results.results[idx].key.secret_access_key }}"
+      bucket_name: "{{ garage_bucket_results.results[idx].bucket.global_aliases[0] }}"
+  delegate_to: localhost
+  become: false
+  loop: "{{ service_envs }}"
+  loop_control:
+    index_var: idx
+    label: "{{ service_name }}-{{ item }}"
+  when:
+    - garage_s3_key_results.results[idx].key.secret_access_key is not none
+    - garage_s3_key_results.results[idx].key.secret_access_key | length > 0

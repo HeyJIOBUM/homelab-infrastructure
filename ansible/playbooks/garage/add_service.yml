@@ -1,0 +1,20 @@
+- name: Add service to garage (create bucker, add creds)
+  hosts: all
+  become: yes
+
+  vars_files:
+    - garage_vars.yml
+  
+  pre_tasks:
+    - name: Validate required variables
+      assert:
+        that:
+          - service_name is defined
+          - service_name | length > 0
+        fail_msg: >-
+          "service_name" is required. Usage:
+          ansible-playbook playbooks/garage/add_service.yml -e "service_name=sync"
+        quiet: true
+  
+  roles:
+    - role: garage_add_service

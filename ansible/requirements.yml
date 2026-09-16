@@ -1,0 +1,4 @@
+collections:
+  - name: occ_automation.garage
+  - name: community.hashi_vault
+  - name: community.docker

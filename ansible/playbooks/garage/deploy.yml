@@ -1,0 +1,7 @@
+- name: Deploy Garage
+  hosts: all
+  become: yes
+  vars_files:
+    - garage_vars.yml
+  roles:
+    - role: garage_deploy

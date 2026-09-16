@@ -1,0 +1,91 @@
+# Garage UI Backend Configuration
+# Managed by Ansible — do not edit manually
+
+# Server configuration
+server:
+  host: "0.0.0.0"
+  port: {{ garage_ui_internal_port }}
+  environment: "{{ garage_ui_environment }}"
+  domain: "localhost"
+  protocol: "http"
+  root_url: "http://localhost:{{ garage_ui_internal_port }}"
+
+  max_body_size: 314572800
+  max_header_size: 32768
+  read_buffer_size: 32768
+  write_buffer_size: 4096
+
+# Garage S3 Configuration
+garage:
+  endpoint: "http://garage:{{ garage_s3_port }}"
+  region: "{{ garage_ui_s3_region }}"
+
+  admin_endpoint: "http://garage:{{ garage_admin_port }}"
+  # admin_token is loaded from GARAGE_UI_GARAGE_ADMIN_TOKEN_FILE
+  admin_token: ""
+
+# Authentication Configuration
+auth:
+  jwt_private_key: "{{ garage_ui_jwt_private_key }}"
+  metrics_public: false
+
+  # Admin Authentication (username/password)
+  admin:
+    enabled: {{ garage_ui_admin_enabled | bool | lower }}
+    username: "{{ garage_ui_admin_username }}"
+    password: "{{ garage_ui_admin_password }}"
+
+  # Admin Token Authentication
+  token:
+    enabled: {{ garage_ui_token_enabled | bool | lower }}
+
+  # OIDC Configuration
+  oidc:
+    enabled: false
+    provider_name: "Keycloak"
+    client_id: "garage-ui"
+    client_secret: "your-client-secret"
+    scopes:
+      - openid
+      - email
+      - profile
+    issuer_url: "https://keycloak.example.com/realms/master"
+    skip_issuer_check: false
+    skip_expiry_check: false
+    email_attribute: "email"
+    username_attribute: "preferred_username"
+    name_attribute: "name"
+    role_attribute_path: "resource_access.garage-ui.roles"
+    admin_role: "admin"
+    tls_skip_verify: false
+    session_max_age: 86400
+    cookie_name: "garage_session"
+    cookie_secure: false
+    cookie_http_only: true
+    cookie_same_site: "lax"
+
+# CORS Configuration
+cors:
+  enabled: true
+  allowed_origins:
+{% for origin in garage_ui_cors_origins %}
+    - "{{ origin }}"
+{% endfor %}
+  allowed_methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  allowed_headers:
+    - Origin
+    - Content-Type
+    - Accept
+    - Authorization
+  allow_credentials: false
+  max_age: 3600
+
+# Logging Configuration
+logging:
+  level: "{{ garage_ui_log_level }}"
+  format: "{{ garage_ui_log_format }}"

@@ -1,0 +1,49 @@
+- name: Create garage directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ garage_service_dir }}"
+    - "{{ garage_config_dir }}"
+    - "{{ garage_data_dir }}"
+    - "{{ garage_meta_dir }}"
+    - "{{ garage_credentials_dir }}"
+
+- name: Write admin token file
+  copy:
+    content: "{{ garage_admin_token }}"
+    dest: "{{ garage_admin_token_file }}"
+    mode: "0600"
+
+- name: Write rpc secret file
+  copy:
+    content: "{{ garage_rpc_secret }}"
+    dest: "{{ garage_rpc_secret_file }}"
+    mode: "0600"
+
+- name: Create garage.toml
+  template:
+    src: garage.toml.j2
+    dest: "{{ garage_config_dir }}/garage.toml"
+    mode: "0644"
+  notify: restart garage container
+
+- name: Create garage-ui.config
+  template:
+    src: garage-ui.config.yml.j2
+    dest: "{{ garage_config_dir }}/config.yaml"
+    mode: "0644"
+  notify: restart garage container
+
+- name: Create docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ garage_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start garage container
+  community.docker.docker_compose_v2:
+    project_src: "{{ garage_service_dir }}"
+    state: present
+    pull: missing
