@@ -1,16 +1,20 @@
-- name: Login to vault as ansible
-  community.hashi_vault.vault_login:
-    url: "{{ vault_addr }}"
-    auth_method: approle
-    role_id: "{{ vault_ansible_role_id }}"
-    secret_id: "{{ vault_ansible_secret_id }}"
-  delegate_to: localhost
-  register: vault_login_result
-  become: false
-  no_log: true
+- name: Vault login
+  block:
+    - name: Login to vault as ansible
+      community.hashi_vault.vault_login:
+        url: "{{ vault_addr }}"
+        auth_method: approle
+        role_id: "{{ vault_ansible_role_id }}"
+        secret_id: "{{ vault_ansible_secret_id }}"
+      delegate_to: localhost
+      register: vault_login_result
+      become: false
+      no_log: true
 
-- name: Set vault_token fact
-  set_fact:
-    vault_token: "{{ vault_login_result.login.auth.client_token }}"
-    cacheable: false
-  no_log: true
+    - name: Set vault_token fact
+      set_fact:
+        vault_token: "{{ vault_login_result.login.auth.client_token }}"
+        cacheable: false
+      no_log: true
+
+  tags: always
