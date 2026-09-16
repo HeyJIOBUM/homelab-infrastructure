@@ -10,7 +10,7 @@ listener "tcp" {
 
 ui = {{ vault_ui_enabled }}
 
-api_addr     = "http://0.0.0.0:{{ vault_port }}"
-cluster_addr = "http://0.0.0.0:{{ vault_api_port }}"
+api_addr     = "{{ vault_proto }}://0.0.0.0:{{ vault_port }}"
+cluster_addr = "{{ vault_proto }}://0.0.0.0:{{ vault_api_port }}"
 
 disable_mlock = {{ vault_disable_mlock | default('true') }}

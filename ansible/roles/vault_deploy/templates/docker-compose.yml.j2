@@ -8,8 +8,8 @@ services:
       - IPC_LOCK
     
     environment:
-      - VAULT_ADDR=http://127.0.0.1:{{ vault_port }}
-      - VAULT_CLUSTER_ADDR=http://127.0.0.1:{{ vault_api_port }}
+      - VAULT_ADDR={{ vault_proto }}://127.0.0.1:{{ vault_port }}
+      - VAULT_CLUSTER_ADDR={{ vault_proto }}://127.0.0.1:{{ vault_api_port }}
       - VAULT_SKIP_VERIFY=true
     
     ports:
