@@ -1,0 +1,10 @@
+- name: Login to vault
+  include_role:
+    name: vault_login
+
+- name: Bootstrap garage secrets
+  include_tasks: 
+    file: garage_secrets.yml
+    apply:
+      tags: bootstap-garage
+  tags: bootstap-garage
