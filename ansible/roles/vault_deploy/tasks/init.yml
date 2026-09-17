@@ -13,12 +13,14 @@
       -format=json > {{ vault_credentials_file }}
   when: vault_initialized.stdout == "false"
   register: init_output
+  no_log: true
 
 - name: Get root token from credentials file
   shell: |
     cat {{ vault_credentials_file }} | jq -r '.root_token'
-  register: root_token
   when: vault_initialized.stdout == "false"
+  register: root_token
+  no_log: true
 
 - name: Save root token to file
   copy:
@@ -26,3 +28,4 @@
     dest: "{{ vault_root_token_file }}"
     mode: 0600
   when: vault_initialized.stdout == "false"
+  no_log: true

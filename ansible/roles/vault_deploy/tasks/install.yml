@@ -23,6 +23,7 @@
     mode: 0644
     owner: 100
     group: 100
+  notify: restart vault container
 
 - name: Create Docker Compose
   template:

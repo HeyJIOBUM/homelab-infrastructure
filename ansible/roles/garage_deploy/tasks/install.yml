@@ -15,12 +15,14 @@
     content: "{{ garage_admin_token }}"
     dest: "{{ garage_admin_token_file }}"
     mode: "0600"
+  no_log: true
 
 - name: Write rpc secret file
   copy:
     content: "{{ garage_rpc_secret }}"
     dest: "{{ garage_rpc_secret_file }}"
     mode: "0600"
+  no_log: true
 
 - name: Create garage.toml
   template:

@@ -1,0 +1,13 @@
+# {{ env }} environment only
+
+path "{{ vault_kv_engine }}/data/{{ env }}/services/{{ service_name }}/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+path "{{ vault_kv_engine }}/metadata/{{ env }}/services/{{ service_name }}/*" {
+  capabilities = ["read", "list"]
+}
+
+path "auth/token/renew-self" {
+  capabilities = ["update"]
+}

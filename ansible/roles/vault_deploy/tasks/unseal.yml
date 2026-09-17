@@ -12,6 +12,7 @@
       docker exec vault vault operator unseal $KEY
     done
   when: vault_sealed.stdout == "true"
+  no_log: true
 
 - name: Wait for Vault to be unsealed
   shell: |

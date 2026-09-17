@@ -14,7 +14,6 @@
     - name: Set vault_token fact
       set_fact:
         vault_token: "{{ vault_login_result.login.auth.client_token }}"
-        cacheable: false
       no_log: true
 
   tags: always

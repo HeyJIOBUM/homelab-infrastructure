@@ -8,6 +8,7 @@
   register: garage_health
   failed_when: false
   changed_when: false
+  no_log: true
 
 - name: Get garage node ID
   shell: |
