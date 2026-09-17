@@ -1,14 +1,3 @@
-- name: Get root token from file
-  slurp:
-    src: "{{ vault_root_token_file }}"
-  register: root_token_data
-  no_log: true
-
-- name: Set vault token
-  set_fact:
-    vault_token: "{{ root_token_data.content | b64decode | trim }}"
-  no_log: true
-
 - name: Create admin policy for Ansible
   shell: |
     echo '{{ ansible_admin_policy }}' | \

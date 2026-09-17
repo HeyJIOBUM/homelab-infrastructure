@@ -1,0 +1,20 @@
+- name: Create admin policy
+  shell: |
+    echo 'path "*" {
+      capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+    }' | docker exec -i -e VAULT_TOKEN={{ vault_token }} vault vault policy write admin -
+  register: result
+  changed_when: "'Successfully uploaded policy' in result.stdout"
+  no_log: true
+
+- name: Create admin user in userpass with admin policy
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault write auth/userpass/users/admin \
+      password={{ vault_admin_password }} \
+      policies=admin \
+      token_ttl=1h \
+      token_max_ttl=4h
+  register: userpass_user
+  changed_when: "'Success' in userpass_user.stdout"
+  no_log: true

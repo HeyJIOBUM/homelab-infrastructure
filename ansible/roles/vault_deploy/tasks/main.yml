@@ -19,12 +19,26 @@
       tags: vault-unseal
   tags: vault-unseal
 
+- name: Prepare token for next tasks
+  include_tasks: 
+    file: prepare_token.yml
+    apply:
+      tags: always
+  tags: always
+
 - name: Configure Vault
   include_tasks: 
     file: configure.yml
     apply:
       tags: vault-configure
   tags: vault-configure
+
+- name: Create admin creds
+  include_tasks: 
+    file: admin.yml
+    apply:
+      tags: vault-admin
+  tags: vault-admin
 
 - name: Create ansible token
   include_tasks: 
