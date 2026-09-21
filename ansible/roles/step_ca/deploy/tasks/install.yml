@@ -22,7 +22,7 @@
 
 - name: Generate init password if missing
   copy:
-    content: "{{ lookup('pipe', 'openssl rand -hex 32') }}\n"
+    content: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
     dest: "{{ step_ca_init_password_file }}"
     mode: "0600"
     owner: 1000
