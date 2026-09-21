@@ -51,7 +51,6 @@
       access_key_id: "{{ garage_s3_key_results.results[idx].key.access_key_id }}"
       secret_access_key: "{{ garage_s3_key_results.results[idx].key.secret_access_key }}"
       bucket_name: "{{ garage_bucket_results.results[idx].bucket.global_aliases[0] }}"
-  delegate_to: localhost
   become: false
   loop: "{{ service_envs }}"
   loop_control:

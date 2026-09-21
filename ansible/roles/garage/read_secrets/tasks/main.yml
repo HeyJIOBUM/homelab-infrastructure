@@ -6,7 +6,6 @@
         token: "{{ vault_token }}"
         engine_mount_point: "{{ vault_kv_engine }}"
         path: "infra/garage"
-      delegate_to: localhost
       become: false
       register: garage_secrets
       no_log: true

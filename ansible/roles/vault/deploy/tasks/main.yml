@@ -1,3 +1,11 @@
+- name: Install hvac library
+  pip:
+    name: hvac
+    state: present
+    executable: pip3
+  become: true
+  tags: always
+
 - name: Install Vault
   include_tasks: 
     file: install.yml
