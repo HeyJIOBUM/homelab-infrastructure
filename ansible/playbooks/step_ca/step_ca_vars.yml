@@ -1,0 +1,26 @@
+# Dirs
+step_ca_service_dir: "{{ services_path }}/step-ca"
+
+step_ca_data_dir: "{{ step_ca_service_dir }}/data"
+step_ca_credentials_dir: "{{ step_ca_service_dir }}/credentials"
+
+step_ca_fingerprint_file: "{{ step_ca_credentials_dir }}/fingerprint"
+
+# Generated init password file
+step_ca_init_password_file: "{{ step_ca_credentials_dir }}/init_password"
+
+# Generated after init
+# copy from data/ to credentials/
+step_ca_root_ca_file: "{{ step_ca_credentials_dir }}/root_ca.crt"
+step_ca_intermediate_ca_file: "{{ step_ca_credentials_dir }}/intermediate_ca.crt"
+
+# Config
+step_ca_image_tag: "0.30.2"
+step_ca_api_port: 9000
+
+# Init
+step_ca_init_name: "Homelab Root CA"
+step_ca_init_dns_names: "step-ca,ca.homelab,localhost,127.0.0.1"
+step_ca_init_provisioner: "acme"
+step_ca_init_ssh: "false"
+

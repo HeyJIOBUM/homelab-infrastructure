@@ -1,5 +1,8 @@
 services_path: /srv/homelab/homelab-infrastructure
 
+# traefik
+traefik_docker_network: traefik
+
 # vault
 vault_port: 8200
 

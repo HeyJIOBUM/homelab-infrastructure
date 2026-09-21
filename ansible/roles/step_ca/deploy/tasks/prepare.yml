@@ -1,0 +1,44 @@
+- name: Ensure required packages are installed
+  apt:
+    name:
+      - curl
+      - gpg
+      - ca-certificates
+      - openssl
+    state: present
+    update_cache: true
+
+- name: Add Smallstep APT signing key
+  get_url:
+    url: https://packages.smallstep.com/keys/apt/repo-signing-key.gpg
+    dest: /etc/apt/keyrings/smallstep.asc
+    mode: "0644"
+
+- name: Add Smallstep APT repository
+  copy:
+    dest: /etc/apt/sources.list.d/smallstep.sources
+    content: |
+      Types: deb
+      URIs: https://packages.smallstep.com/stable/debian
+      Suites: debs
+      Components: main
+      Signed-By: /etc/apt/keyrings/smallstep.asc
+    mode: "0644"
+  register: step_ca_apt_repo
+
+- name: Update apt cache after adding repository
+  apt:
+    update_cache: true
+  when: step_ca_apt_repo.changed
+
+- name: Install step-cli
+  apt:
+    name: step-cli
+    state: present
+  register: step_cli_install
+
+- name: Verify step-cli installation
+  command:
+    cmd: step version
+  register: step_cli_version
+  changed_when: false

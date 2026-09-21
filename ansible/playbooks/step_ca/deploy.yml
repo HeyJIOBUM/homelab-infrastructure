@@ -1,0 +1,7 @@
+- name: Deploy Vault
+  hosts: all
+  become: yes
+  vars_files:
+    - step_ca_vars.yml
+  roles:
+    - role: step_ca/deploy

@@ -1,0 +1,29 @@
+- name: Get CA fingerprint from running container
+  community.docker.docker_container_exec:
+    container: step-ca
+    command: step certificate fingerprint /home/step/certs/root_ca.crt
+  register: step_ca_fingerprint_raw
+  changed_when: false
+  check_mode: false
+
+- name: Set fingerprint fact
+  set_fact:
+    step_ca_fingerprint: "{{ step_ca_fingerprint_raw.stdout | trim }}"
+
+- name: Persist fingerprint to credentials dir
+  copy:
+    content: "{{ step_ca_fingerprint }}"
+    dest: "{{ step_ca_fingerprint_file }}"
+    mode: "0644"
+  changed_when: false
+
+- name: Bootstrap step-cli against local CA
+  command:
+    cmd: >-
+      step ca bootstrap
+      --ca-url https://localhost:{{ step_ca_api_port }}
+      --fingerprint {{ step_ca_fingerprint }}
+      --force
+  register: step_ca_bootstrap_result
+  changed_when: "'Your CA is ready for use' in step_ca_bootstrap_result.stdout"
+  check_mode: false
