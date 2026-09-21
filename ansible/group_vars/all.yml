@@ -1,5 +1,8 @@
 services_path: /srv/homelab/homelab-infrastructure
 
+ansible_venv_path: /opt/ansible-venv
+ansible_python_interpreter: "{{ ansible_venv_path }}/bin/python"
+
 # traefik
 traefik_docker_network: traefik
 
