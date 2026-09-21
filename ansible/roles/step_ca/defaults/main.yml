@@ -15,7 +15,21 @@ step_ca_root_ca_file: "{{ step_ca_credentials_dir }}/root_ca.crt"
 step_ca_intermediate_ca_file: "{{ step_ca_credentials_dir }}/intermediate_ca.crt"
 
 # vault
-garage_vault_path: infra/step_ca
+step_ca_vault_path: infra/step_ca
+step_ca_vault_secrets:
+  - ansible_name: step_ca_fingerprint
+    vault_name: fingerprint
+    file: "{{ step_ca_fingerprint_file }}"
+  - ansible_name: step_ca_init_password
+    vault_name: init_password
+    file: "{{ step_ca_init_password_file }}"
+  - ansible_name: step_ca_intermediate_ca
+    vault_name: intermediate_ca
+    file: "{{ step_ca_intermediate_ca_file }}"
+  - ansible_name: step_ca_root_ca
+    vault_name: root_ca
+    file: "{{ step_ca_root_ca_file }}"
+
 
 # Config
 step_ca_image_tag: "0.30.2"

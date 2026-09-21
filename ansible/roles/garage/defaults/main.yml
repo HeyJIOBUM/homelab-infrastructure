@@ -30,6 +30,13 @@ garage_node_zone: dc1
 
 # vault
 garage_vault_path: infra/garage
+garage_vault_secrets:
+  - ansible_name: garage_rpc_secret
+    vault_name: rpc_secret
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
+  - ansible_name: garage_admin_token
+    vault_name: admin_token
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
 
 # service
 service_envs: ["dev", "server"] 

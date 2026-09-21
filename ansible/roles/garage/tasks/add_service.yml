@@ -6,7 +6,7 @@
 - name: Get garage secrets
   include_role:
     name: garage
-    tasks_from: read_secrets
+    tasks_from: _read_vault_secrets
 
 - name: Create S3 access key for {{ service_name }}
   occ_automation.garage.garage_key:
