@@ -2,6 +2,6 @@
   hosts: all
   become: yes
   vars_files:
-    - garage_vars.yml
+    - vars.yml
   roles:
     - role: garage/deploy

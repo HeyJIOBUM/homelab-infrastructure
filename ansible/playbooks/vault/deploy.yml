@@ -6,7 +6,7 @@
     VAULT_ADDR: "{{ vault_addr }}"
 
   vars_files:
-    - vault_vars.yml
+    - vars.yml
 
   roles:
     - role: vault/deploy
