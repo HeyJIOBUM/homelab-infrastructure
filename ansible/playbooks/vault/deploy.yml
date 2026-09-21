@@ -1,12 +1,17 @@
 - name: Deploy Vault
   hosts: all
   become: yes
-  
   environment:
     VAULT_ADDR: "{{ vault_addr }}"
-
-  vars_files:
-    - vars.yml
-
-  roles:
-    - role: vault/deploy
+  pre_tasks:
+    - name: Preflight checks
+      include_role:
+        name: preflight
+      vars:
+        preflight_required_vars:
+          - vault_admin_password
+  tasks:
+    - name: Deploy vault
+      include_role:
+        name: vault
+        tasks_from: deploy

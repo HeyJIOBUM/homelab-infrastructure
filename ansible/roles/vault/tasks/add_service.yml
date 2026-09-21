@@ -1,6 +1,7 @@
 - name: Login to vault
   include_role:
-    name: vault/login
+    name: vault
+    tasks_from: login
 
 - name: Render service policy
   template:

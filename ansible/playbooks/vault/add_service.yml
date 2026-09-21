@@ -1,23 +1,19 @@
 - name: Add service to Vault
   hosts: all
   become: yes
-  
   environment:
     VAULT_ADDR: "{{ vault_addr }}"
-
-  vars_files:
-    - vars.yml
-
   pre_tasks:
-    - name: Validate required variables
-      assert:
-        that:
-          - service_name is defined
-          - service_name | length > 0
-        fail_msg: >-
-          "service_name" is required. Usage:
-          ansible-playbook playbooks/vault/add_service.yml -e "service_name=sync"
-        quiet: true
-
-  roles:
-    - role: vault/add_service
+    - name: Preflight checks
+      include_role:
+        name: preflight
+      vars:
+        preflight_required_vars:
+          - service_name
+          - vault_ansible_role_id
+          - vault_ansible_secret_id
+  tasks:
+    - name: Add vault service
+      include_role:
+        name: vault
+        tasks_from: add_service

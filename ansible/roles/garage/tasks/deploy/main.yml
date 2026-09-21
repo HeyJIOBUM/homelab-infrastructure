@@ -1,11 +1,13 @@
 - name: Login to vault
   include_role:
-    name: vault/login
+    name: vault
+    tasks_from: login
   tags: always
 
 - name: Get garage secrets
   include_role:
-    name: garage/read_secrets
+    name: garage
+    tasks_from: read_secrets
   tags: always
 
 - name: Install garage

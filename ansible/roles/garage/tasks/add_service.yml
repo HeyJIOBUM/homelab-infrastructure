@@ -1,10 +1,12 @@
 - name: Login to vault
   include_role:
-    name: vault/login
+    name: vault
+    tasks_from: login
 
 - name: Get garage secrets
   include_role:
-    name: garage/read_secrets
+    name: garage
+    tasks_from: read_secrets
 
 - name: Create S3 access key for {{ service_name }}
   occ_automation.garage.garage_key:

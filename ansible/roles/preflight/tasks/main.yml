@@ -1,0 +1,12 @@
+- name: Validate required variables are defined and non-empty
+  assert:
+    that:
+      - lookup('vars', item) is defined
+      - lookup('vars', item) is not none
+      - lookup('vars', item) | length > 0
+    fail_msg: "Required variable '{{ item }}' is missing or empty"
+    success_msg: "{{ item }} is set"
+  loop: "{{ preflight_required_vars }}"
+  loop_control:
+    label: "{{ item }}"
+  register: preflight_vars_check
