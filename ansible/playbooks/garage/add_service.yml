@@ -17,4 +17,4 @@
         quiet: true
   
   roles:
-    - role: garage_add_service
+    - role: garage/add_service

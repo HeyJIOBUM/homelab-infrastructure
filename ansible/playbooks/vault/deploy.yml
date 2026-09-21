@@ -9,4 +9,4 @@
     - vault_vars.yml
 
   roles:
-    - role: vault_deploy
+    - role: vault/deploy

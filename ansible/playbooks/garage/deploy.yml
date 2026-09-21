@@ -4,4 +4,4 @@
   vars_files:
     - garage_vars.yml
   roles:
-    - role: garage_deploy
+    - role: garage/deploy

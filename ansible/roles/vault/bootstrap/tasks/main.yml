@@ -1,6 +1,6 @@
 - name: Login to vault
   include_role:
-    name: vault_login
+    name: vault/login
   tags: always
 
 - name: Bootstrap garage secrets

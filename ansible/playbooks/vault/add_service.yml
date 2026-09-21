@@ -20,4 +20,4 @@
         quiet: true
 
   roles:
-    - role: vault_add_service
+    - role: vault/add_service
