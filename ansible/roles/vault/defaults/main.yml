@@ -8,6 +8,10 @@ vault_credentials_file: "{{ vault_credentials_dir }}/vault-keys.json"
 vault_root_token_file: "{{ vault_credentials_dir }}/.vault-root-token"
 vault_ansible_creds_file: "{{ vault_credentials_dir }}/ansible.yml"
 
+vault_tls_dir: "{{ vault_service_dir }}/tls"
+vault_tls_cert: "{{ vault_tls_dir }}/vault.crt"
+vault_tls_key: "{{ vault_tls_dir }}/vault.key"
+
 # vault config
 vault_api_port: 8201
 

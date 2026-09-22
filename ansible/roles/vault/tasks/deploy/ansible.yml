@@ -1,3 +1,12 @@
+- name: Check if ansible-admin policy exists
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault policy read ansible-admin >/dev/null 2>&1 && echo "exists" || echo "missing"
+  register: ansible_policy_check
+  changed_when: false
+  failed_when: false
+  no_log: true
+
 - name: Create admin policy for Ansible
   shell: |
     echo '{{ ansible_admin_policy }}' | \
@@ -37,7 +46,17 @@
         capabilities = ["read"]
       }
   register: ansible_policy
+  when: "'exists' not in ansible_policy_check.stdout"
   changed_when: "'Success' in ansible_policy.stdout"
+  no_log: true
+
+- name: Check if ansible AppRole exists
+  shell: |
+    docker exec -e VAULT_TOKEN={{ vault_token }} vault \
+      vault read auth/approle/role/ansible >/dev/null 2>&1 && echo "exists" || echo "missing"
+  register: ansible_approle_check
+  changed_when: false
+  failed_when: false
   no_log: true
 
 - name: Create AppRole for Ansible
@@ -49,6 +68,7 @@
       token_max_ttl={{ ansible_token_max_ttl }} \
       policies=ansible-admin
   register: ansible_approle
+  when: "'exists' not in ansible_approle_check.stdout"
   changed_when: "'Success' in ansible_approle.stdout or 'created' in ansible_approle.stdout"
   no_log: true
 

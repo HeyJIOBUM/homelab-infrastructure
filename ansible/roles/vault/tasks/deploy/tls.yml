@@ -1,0 +1,16 @@
+- name: Issue TLS certificate for Vault
+  include_role:
+    name: step_ca
+    tasks_from: issue_certificate
+  vars:
+    tls_subject: "vault.homelab"
+    tls_dir: "{{ vault_tls_dir }}"
+    tls_cert_file: "{{ vault_tls_cert }}"
+    tls_key_file: "{{ vault_tls_key }}"
+    tls_san:
+      - "vault.homelab"
+      - "vault"
+      - "localhost"
+      - "{{ ansible_facts.default_ipv4.address }}"
+    tls_owner: "100"
+    tls_group: "100"

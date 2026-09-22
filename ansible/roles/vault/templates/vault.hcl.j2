@@ -6,6 +6,10 @@ storage "raft" {
 listener "tcp" {
   address     = "0.0.0.0:{{ vault_port }}"
   tls_disable = {{ vault_tls_disable }}
+{% if vault_tls_disable | bool == false %}
+  tls_cert_file = "/vault/tls/vault.crt"
+  tls_key_file  = "/vault/tls/vault.key"
+{% endif %}
 }
 
 ui = {{ vault_ui_enabled }}

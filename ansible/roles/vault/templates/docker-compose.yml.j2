@@ -18,5 +18,6 @@ services:
     volumes:
       - {{ vault_config_dir }}:/vault/config:ro
       - {{ vault_data_dir }}:/vault/data
+      - {{ vault_tls_dir }}:/vault/tls:ro
     
     command: server

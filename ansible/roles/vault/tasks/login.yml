@@ -7,7 +7,6 @@
         role_id: "{{ vault_ansible_role_id }}"
         secret_id: "{{ vault_ansible_secret_id }}"
       register: vault_login_result
-      become: false
       no_log: true
 
     - name: Set vault_token fact

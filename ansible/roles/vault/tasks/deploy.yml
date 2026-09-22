@@ -2,9 +2,16 @@
   pip:
     name: hvac
     state: present
-    executable: pip3
-  become: true
+    virtualenv: "{{ ansible_venv_path }}"
   tags: always
+
+- name: Validate tls certificate if enabled
+  include_tasks: 
+    file: deploy/tls.yml
+    apply:
+      tags: vault-tls
+  tags: vault-tls
+  when: not vault_tls_disable | bool
 
 - name: Install Vault
   include_tasks: 
