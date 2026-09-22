@@ -9,4 +9,4 @@
   loop: "{{ preflight_required_vars }}"
   loop_control:
     label: "{{ item }}"
-  register: preflight_vars_check
+  tags: always

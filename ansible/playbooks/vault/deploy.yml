@@ -10,8 +10,10 @@
       vars:
         preflight_required_vars:
           - vault_admin_password
+      tags: always
   tasks:
     - name: Deploy vault
       include_role:
         name: vault
         tasks_from: deploy
+      tags: always
