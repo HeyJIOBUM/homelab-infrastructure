@@ -1,0 +1,11 @@
+# Dirs
+traefik_service_dir: "{{ services_path }}/traefik"
+traefik_data_dir: "{{ traefik_service_dir }}/data"
+traefik_credentials_dir: "{{ traefik_service_dir }}/credentials"
+
+# vault
+traefik_vault_path: infra/traefik
+traefik_vault_secrets:
+  - ansible_name: 
+    vault_name: 
+    generator: 

@@ -1,0 +1,18 @@
+- name: Deploy traefik
+  hosts: all
+  become: yes
+  pre_tasks:
+    - name: Preflight checks
+      include_role:
+        name: preflight
+      vars:
+        preflight_required_vars:
+          - vault_ansible_role_id
+          - vault_ansible_secret_id
+      tags: always
+  tasks:
+    - name: Deploy traefic
+      include_role:
+        name: traefic
+        tasks_from: deploy
+      tags: always
