@@ -1,0 +1,30 @@
+- name: Check if ACME provisioner already exists
+  command:
+    cmd: docker exec step-ca step ca provisioner list
+  register: step_ca_provisioners
+  changed_when: false
+  failed_when: false
+
+- name: Add ACME provisioner
+  command:
+    cmd: >-
+      docker exec step-ca step ca provisioner add {{ step_ca_acme_provisioner_name }}
+      --type ACME
+      --x509-default-dur={{ step_ca_acme_default_duration }}
+      --x509-max-dur={{ step_ca_acme_max_duration }}
+      --password-file {{ step_ca_init_password_container_file }}
+  register: acme_provisioner_add
+  when: step_ca_acme_provisioner_name not in step_ca_provisioners.stdout
+  changed_when: acme_provisioner_add.rc == 0
+  failed_when:
+    - acme_provisioner_add.rc != 0
+    - "'already exists' not in acme_provisioner_add.stderr"
+  notify: reload step-ca container
+
+- name: Update JWK provisioner durations
+  command:
+    cmd: >-
+      docker exec step-ca step ca provisioner update {{ step_ca_jwk_provisioner_name }}
+      --x509-default-dur={{ step_ca_jwk_default_duration }}
+      --x509-max-dur={{ step_ca_jwk_max_duration }}
+  notify: reload step-ca container

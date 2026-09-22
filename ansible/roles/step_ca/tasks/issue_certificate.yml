@@ -1,0 +1,75 @@
+- name: Validate required parameters
+  assert:
+    that:
+      - tls_subject | length > 0
+      - tls_dir | length > 0
+      - tls_cert_file | length > 0
+      - tls_key_file | length > 0
+    fail_msg: >-
+      tls_subject, tls_dir, tls_cert_file, tls_key_file are required.
+
+- name: Ensure TLS directory exists
+  file:
+    path: "{{ tls_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Check if certificate already exists
+  stat:
+    path: "{{ tls_cert_file }}"
+  register: tls_cert_stat
+
+- name: Check certificate expiration
+  command:
+    cmd: >-
+      openssl x509 -in {{ tls_cert_file }} -noout -checkend {{ tls_renew_threshold }}
+  register: tls_cert_check
+  changed_when: false
+  failed_when: false
+  when: tls_cert_stat.stat.exists
+
+- name: Determine if certificate needs renewal
+  set_fact:
+    tls_needs_renewal: >-
+      {{
+        not tls_cert_stat.stat.exists
+        or tls_force_renew
+        or (tls_cert_check.rc is defined and tls_cert_check.rc != 0)
+      }}
+
+- name: Issue certificate from Step-CA
+  when: tls_needs_renewal
+  block:
+    - name: Issue certificate from Step-CA
+      command:
+        cmd: >-
+          step ca certificate {{ tls_subject }}
+          {{ tls_cert_file }} {{ tls_key_file }}
+          --ca-url {{ tls_step_ca_url }}
+          --root {{ tls_step_ca_root }}
+          --provisioner {{ tls_step_ca_provisioner }}
+          --provisioner-password-file {{ tls_step_ca_provisioner_password_file }}
+          --not-after {{ tls_not_after }}
+          {% for san in tls_san %}--san {{ san }} {% endfor %}
+          --force
+      register: tls_issue_result
+      changed_when: tls_issue_result.rc == 0
+
+    - name: Set ownership on certificate
+      file:
+        path: "{{ tls_cert_file }}"
+        owner: "{{ tls_owner }}"
+        group: "{{ tls_group }}"
+        mode: "{{ tls_cert_mode }}"
+
+    - name: Set ownership on private key
+      file:
+        path: "{{ tls_key_file }}"
+        owner: "{{ tls_owner }}"
+        group: "{{ tls_group }}"
+        mode: "{{ tls_key_mode }}"
+
+    - name: Verify certificate
+      command:
+        cmd: step certificate verify {{ tls_cert_file }} --roots {{ tls_step_ca_root }}
+      changed_when: false

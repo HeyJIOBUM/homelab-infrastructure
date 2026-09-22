@@ -14,6 +14,8 @@ step_ca_init_password_file: "{{ step_ca_credentials_dir }}/init_password"
 step_ca_root_ca_file: "{{ step_ca_credentials_dir }}/root_ca.crt"
 step_ca_intermediate_ca_file: "{{ step_ca_credentials_dir }}/intermediate_ca.crt"
 
+step_ca_init_password_container_file: "/home/step/credentials/init-password"
+
 # vault
 step_ca_vault_path: infra/step_ca
 step_ca_vault_secrets:
@@ -33,10 +35,42 @@ step_ca_vault_secrets:
 
 # Config
 step_ca_image_tag: "0.30.2"
-step_ca_api_port: 9000
 
 # Init
 step_ca_init_name: "Homelab Root CA"
-step_ca_init_dns_names: "step-ca,ca.homelab,localhost,127.0.0.1"
-step_ca_init_provisioner: "acme"
+step_ca_init_dns_names: "step-ca,ca.homelab,localhost,127.0.0.1,{{ step_ca_ip }}"
+step_ca_init_jwk_provisioner_name: "admin_jwk"
 step_ca_init_ssh: "false"
+
+# acme provisioner
+step_ca_acme_provisioner_name: "acme"
+step_ca_acme_password_file: "{{ step_ca_init_password_file }}"
+step_ca_acme_default_duration: "24h"
+step_ca_acme_max_duration: "24h"
+
+# jwk provisioner
+step_ca_jwk_provisioner_name: "{{ step_ca_init_jwk_provisioner_name }}"
+step_ca_jwk_password_file: "{{ step_ca_init_password_file }}"
+step_ca_jwk_default_duration: "2160h"
+step_ca_jwk_max_duration: "2160h"
+
+# Issue certificate with kwk provisioner
+tls_subject: ""
+tls_dir: ""
+tls_cert_file: ""
+tls_key_file: ""
+tls_san: []
+
+tls_renew_threshold: 604800
+tls_force_renew: false
+
+tls_not_after: "2160h"
+tls_step_ca_url: "{{ step_ca_addr }}"
+tls_step_ca_root: "{{ step_ca_root_ca_file }}"
+tls_step_ca_provisioner: "{{ step_ca_jwk_provisioner_name }}"
+tls_step_ca_provisioner_password_file: "{{ step_ca_jwk_password_file }}"
+
+tls_owner: "root"
+tls_group: "root"
+tls_cert_mode: "0644"
+tls_key_mode: "0600"

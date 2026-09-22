@@ -18,3 +18,10 @@
     apply:
       tags: step_ca-bootstrap
   tags: step_ca-bootstrap
+
+- name: Configure provisioners step_ca
+  include_tasks:
+    file: deploy/configure_provisioners.yml
+    apply:
+      tags: step_ca-provisioners
+  tags: step_ca-provisioners
