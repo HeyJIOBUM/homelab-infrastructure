@@ -7,13 +7,19 @@ ansible_python_interpreter: "{{ ansible_venv_path }}/bin/python"
 traefik_docker_network: traefik
 
 # vault
-vault_port: 8200
+vault_kv_engine: "secret"
 
 vault_tls_disable: "true"
 vault_proto: "{{ 'http' if vault_tls_disable | bool else 'https' }}"
 
-vault_addr: "{{ vault_proto }}://{{ hostvars['vps1'].ansible_host }}:{{ vault_port }}"
-vault_kv_engine: "secret"
+vault_port: 8200
+vault_ip: "{{ hostvars['vps1'].ansible_host }}"
+vault_addr: "{{ vault_proto }}://{{ vault_ip }}:{{ vault_port }}"
+
+# step_ca
+step_ca_api_port: 9000
+step_ca_ip: "{{ hostvars['vps1'].ansible_host }}"
+step_ca_addr: "{{ vault_proto }}://{{ step_ca_ip }}:{{ step_ca_api_port }}"
 
 vault_ansible_role_id: !vault |
   $ANSIBLE_VAULT;1.1;AES256
