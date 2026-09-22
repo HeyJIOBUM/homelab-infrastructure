@@ -1,2 +1,25 @@
-- name: Deploy garage
-  include_tasks: deploy/main.yml
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags: always
+
+- name: Get garage secrets
+  include_role:
+    name: garage
+    tasks_from: _read_vault_secrets
+  tags: always
+
+- name: Install garage
+  include_tasks:
+    file: deploy/install.yml
+    apply:
+      tags: garage-install
+  tags: garage-install
+
+- name: Initialize garage layout
+  include_tasks:
+    file: deploy/init.yml
+    apply:
+      tags: garage-init
+  tags: garage-init

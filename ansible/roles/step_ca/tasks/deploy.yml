@@ -1,2 +1,20 @@
-- name: Deploy step-ca
-  include_tasks: deploy/main.yml
+- name: Prepare step_ca dependencies
+  include_tasks:
+    file: deploy/prepare.yml
+    apply:
+      tags: step_ca-prepare
+  tags: step_ca-prepare
+
+- name: Install step_ca
+  include_tasks:
+    file: deploy/install.yml
+    apply:
+      tags: step_ca-install
+  tags: step_ca-install
+
+- name: Bootstrap step_ca
+  include_tasks:
+    file: deploy/bootstrap.yml
+    apply:
+      tags: step_ca-bootstrap
+  tags: step_ca-bootstrap

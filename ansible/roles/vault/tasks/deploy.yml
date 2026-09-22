@@ -1,2 +1,56 @@
-- name: Deploy vault
-  include_tasks: deploy/main.yml
+- name: Install hvac library
+  pip:
+    name: hvac
+    state: present
+    executable: pip3
+  become: true
+  tags: always
+
+- name: Install Vault
+  include_tasks: 
+    file: deploy/install.yml
+    apply:
+      tags: vault-install
+  tags: vault-install
+
+- name: Initialize Vault
+  include_tasks: 
+    file: deploy/init.yml
+    apply:
+      tags: vault-init
+  tags: vault-init
+
+- name: Unseal Vault
+  include_tasks: 
+    file: deploy/unseal.yml
+    apply:
+      tags: vault-unseal
+  tags: vault-unseal
+
+- name: Prepare token for next tasks
+  include_tasks: 
+    file: deploy/prepare_token.yml
+    apply:
+      tags: always
+  tags: always
+
+- name: Configure Vault
+  include_tasks: 
+    file: deploy/configure.yml
+    apply:
+      tags: vault-configure
+  tags: vault-configure
+
+- name: Create admin creds
+  include_tasks: 
+    file: deploy/admin.yml
+    apply:
+      tags: vault-admin
+  tags: vault-admin
+
+- name: Create ansible token
+  include_tasks: 
+    file: deploy/ansible.yml
+    apply:
+      tags: vault-ansible
+  tags: vault-ansible
