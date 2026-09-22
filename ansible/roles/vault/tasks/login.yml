@@ -3,6 +3,7 @@
     - name: Login to vault as ansible
       community.hashi_vault.vault_login:
         url: "{{ vault_addr }}"
+        ca_cert: "{{ step_ca_system_ca_path }}"
         auth_method: approle
         role_id: "{{ vault_ansible_role_id }}"
         secret_id: "{{ vault_ansible_secret_id }}"

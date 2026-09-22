@@ -1,12 +1,19 @@
 services_path: /srv/homelab/homelab-infrastructure
 
+# ansible
 ansible_venv_path: /opt/ansible-venv
 ansible_python_interpreter: "{{ ansible_venv_path }}/bin/python"
 
-# traefik
-traefik_docker_network: traefik
+# step_ca
+step_ca_system_ca_path: "/usr/local/share/ca-certificates/homelab-root-ca.crt"
+
+step_ca_api_port: 9000
+step_ca_ip: "{{ hostvars['vps1'].ansible_host }}"
+step_ca_addr: "{{ vault_proto }}://{{ step_ca_ip }}:{{ step_ca_api_port }}"
 
 # vault
+ansible_hashi_vault_ca_cert: "{{ step_ca_system_ca_path }}"
+
 vault_kv_engine: "secret"
 
 vault_tls_disable: "false"
@@ -15,11 +22,6 @@ vault_proto: "{{ 'http' if vault_tls_disable | bool else 'https' }}"
 vault_port: 8200
 vault_ip: "{{ hostvars['vps1'].ansible_host }}"
 vault_addr: "{{ vault_proto }}://{{ vault_ip }}:{{ vault_port }}"
-
-# step_ca
-step_ca_api_port: 9000
-step_ca_ip: "{{ hostvars['vps1'].ansible_host }}"
-step_ca_addr: "{{ vault_proto }}://{{ step_ca_ip }}:{{ step_ca_api_port }}"
 
 vault_ansible_role_id: !vault |
   $ANSIBLE_VAULT;1.1;AES256
@@ -46,3 +48,6 @@ vault_admin_password: !vault |
   65666137363332393865636462623535633639626436373834616433666437346137363230353961
   3333363966646438350a316362353532393333633365666266356136386534656337386531303865
   66333861323863643638663563393639663138623661306361613565663033356136
+
+# traefik
+traefik_docker_network: traefik

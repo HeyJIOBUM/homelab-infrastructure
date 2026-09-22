@@ -46,6 +46,7 @@
 - name: Save S3 credentials to Vault
   community.hashi_vault.vault_kv2_write:
     url: "{{ vault_addr }}"
+    ca_cert: "{{ step_ca_system_ca_path }}"
     token: "{{ vault_token }}"
     engine_mount_point: "{{ vault_kv_engine }}"
     path: "{{ item }}/services/{{ service_name }}/garage"
