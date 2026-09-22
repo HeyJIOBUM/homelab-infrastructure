@@ -42,5 +42,6 @@
           - hvac
           - requests
           - jmespath
+          - packaging
         state: present
         virtualenv: "{{ ansible_venv_path }}"
