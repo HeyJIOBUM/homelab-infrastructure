@@ -34,3 +34,8 @@ ansible_token_max_ttl: "4h"
 
 # service
 service_envs: ["dev", "server"] 
+
+# init_services_templates
+vault_log_service_name: "not_set"
+vault_service_secrets: []
+vault_service_secrets_path: ""
