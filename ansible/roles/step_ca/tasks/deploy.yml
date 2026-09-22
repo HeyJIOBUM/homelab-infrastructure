@@ -12,6 +12,13 @@
       tags: step_ca-install
   tags: step_ca-install
 
+- name: Trust generated root certificate
+  include_tasks:
+    file: deploy/trust_certificate.yml
+    apply:
+      tags: step_ca-trust
+  tags: step_ca-trust
+
 - name: Bootstrap step_ca
   include_tasks:
     file: deploy/bootstrap.yml

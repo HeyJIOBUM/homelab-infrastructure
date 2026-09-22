@@ -16,6 +16,9 @@ step_ca_intermediate_ca_file: "{{ step_ca_credentials_dir }}/intermediate_ca.crt
 
 step_ca_init_password_container_file: "/home/step/credentials/init-password"
 
+step_ca_system_ca_path: "/usr/local/share/ca-certificates/homelab-root-ca.crt"
+step_ca_controller_ca_fetch_path: "/tmp/step-ca-root_ca.crt"
+
 # vault
 step_ca_vault_path: infra/step_ca
 step_ca_vault_secrets:
@@ -31,7 +34,6 @@ step_ca_vault_secrets:
   - ansible_name: step_ca_root_ca
     vault_name: root_ca
     file: "{{ step_ca_root_ca_file }}"
-
 
 # Config
 step_ca_image_tag: "0.30.2"

@@ -1,0 +1,47 @@
+- name: Install root ca into system trust store on target host
+  copy:
+    src: "{{ step_ca_root_ca_file }}"
+    dest: "{{ step_ca_system_ca_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+    remote_src: true
+  register: step_ca_target_ca_installed
+
+- name: Update ca certificates on target host
+  command:
+    cmd: update-ca-certificates
+  when: step_ca_target_ca_installed.changed
+  changed_when: step_ca_target_ca_installed.changed
+
+- name: Fetch root ca from target host to controller
+  fetch:
+    src: "{{ step_ca_root_ca_file }}"
+    dest: "{{ step_ca_controller_ca_fetch_path }}"
+    flat: true
+  run_once: true
+
+- name: Install certificate on controller
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Install root ca into system trust store on controller
+      copy:
+        src: "{{ step_ca_controller_ca_fetch_path }}"
+        dest: "{{ step_ca_system_ca_path }}"
+        owner: root
+        group: root
+        mode: "0644"
+        remote_src: true
+      register: step_ca_controller_ca_installed
+
+    - name: Update ca certificates on controller
+      command:
+        cmd: update-ca-certificates
+      when: step_ca_controller_ca_installed.changed
+      changed_when: step_ca_controller_ca_installed.changed
+
+    - name: Remove fetched root CA from controller
+      ansible.builtin.file:
+        path: "{{ step_ca_controller_ca_fetch_path }}"
+        state: absent
