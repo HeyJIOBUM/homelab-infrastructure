@@ -1,0 +1,20 @@
+# Dirs
+technitium_service_dir: "{{ services_path }}/technitium"
+technitium_config_dir: "{{ technitium_service_dir }}/config"
+technitium_credentials_dir: "{{ technitium_service_dir }}/credentials"
+
+technitium_admin_password_file: "{{ technitium_credentials_dir }}/admin_password"
+technitium_container_admin_password_file: "/etc/technitium/admin_password"
+
+# config
+technitium_tag: "15.5.1"
+
+# vault
+technitium_vault_path: infra/technitium
+technitium_vault_secrets:
+  - ansible_name: technitium_admin_password
+    vault_name: admin_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
+  - ansible_name: technitium_api_token
+    vault_name: api_token
+    generator: ""

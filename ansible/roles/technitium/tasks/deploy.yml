@@ -1,0 +1,36 @@
+- name: Disable resolved
+  include_tasks: 
+    file: deploy/disable_resolved.yml
+    apply:
+      tags: technitium-prepare
+  tags: technitium-prepare
+
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags:
+    - technitium-install
+    - technitium-configure
+
+- name: Get technitium secrets
+  include_role:
+    name: technitium
+    tasks_from: read_vault_secrets
+  tags:
+    - technitium-install
+    - technitium-configure
+
+- name: Install technitium
+  include_tasks: 
+    file: deploy/install.yml
+    apply:
+      tags: technitium-install
+  tags: technitium-install
+
+- name: Configure technitium
+  include_tasks: 
+    file: deploy/configure.yml
+    apply:
+      tags: technitium-configure
+  tags: technitium-configure

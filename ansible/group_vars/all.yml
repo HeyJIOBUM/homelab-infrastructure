@@ -51,3 +51,8 @@ vault_admin_password: !vault |
 
 # traefik
 traefik_docker_network: traefik
+
+# technitium
+technitium_api_port: "5380"
+technitium_ip: "{{ hostvars['vps1'].ansible_host }}"
+technitium_addr: "http://{{ technitium_ip }}:{{ technitium_api_port }}"

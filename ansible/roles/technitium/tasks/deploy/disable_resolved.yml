@@ -1,0 +1,61 @@
+- name: Check if systemd-resolved is active
+  command: systemctl is-active systemd-resolved
+  register: resolved_active
+  failed_when: false
+  changed_when: false
+
+- name: Disable systemd-resolved to free port 53
+  when:
+    - resolved_active.stdout | default('inactive') == 'active'
+  block:
+    - name: Stop and disable systemd-resolved
+      systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: no
+      failed_when: false
+
+    - name: Check if /etc/resolv.conf is immutable
+      command: lsattr /etc/resolv.conf
+      register: lsattr_check
+      changed_when: false
+      failed_when: false
+
+    - name: Remove immutable flag from /etc/resolv.conf
+      command: chattr -i /etc/resolv.conf
+      when: "'i' in lsattr_check.stdout"
+
+    - name: Check if /etc/resolv.conf is a symlink
+      stat:
+        path: /etc/resolv.conf
+      register: resolv_conf_stat
+
+    - name: Remove /etc/resolv.conf if it is a symlink
+      file:
+        path: /etc/resolv.conf
+        state: absent
+      when: resolv_conf_stat.stat.islnk | default(false)
+
+    - name: Create new /etc/resolv.conf with public DNS
+      copy:
+        content: |
+          nameserver 1.1.1.1
+          nameserver 8.8.8.8
+        dest: /etc/resolv.conf
+        mode: "0644"
+
+    - name: Lock /etc/resolv.conf to prevent overwriting
+      command: chattr +i /etc/resolv.conf
+      when: "'i' not in lsattr_check.stdout"
+      changed_when: true
+
+    - name: Check if port 53 is in use
+      command: ss -luntp
+      register: port_53_check
+      changed_when: false
+      failed_when: false
+
+    - name: Fail if port 53 is still in use
+      fail:
+        msg: "Port 53 is still in use: {{ port_53_check.stdout_lines | select('search', ':53 ') | list }}"
+      when: port_53_check.stdout is search(':53 ')

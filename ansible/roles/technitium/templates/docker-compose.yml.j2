@@ -1,0 +1,22 @@
+services:
+  technitium:
+    container_name: technitium
+    image: docker.io/technitium/dns-server:{{ technitium_tag }}
+    ports:
+      - "{{ technitium_api_port }}:5380/tcp"
+      - "53:53/udp"
+      - "53:53/tcp"
+    environment:
+      - DNS_SERVER_DOMAIN=dns.homelab
+      - DNS_SERVER_ADMIN_PASSWORD_FILE={{ technitium_container_admin_password_file }}
+      - DNS_SERVER_LOG_USING_LOCAL_TIME=true
+    volumes:
+      - {{ technitium_config_dir }}:/etc/dns
+      - {{ technitium_admin_password_file }}:{{ technitium_container_admin_password_file }}:ro
+    restart: unless-stopped
+    networks:
+      - {{ traefik_docker_network }}
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true

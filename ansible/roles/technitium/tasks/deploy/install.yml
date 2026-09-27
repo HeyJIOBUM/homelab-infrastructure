@@ -1,0 +1,27 @@
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ technitium_service_dir }}"
+    - "{{ technitium_config_dir }}"
+    - "{{ technitium_credentials_dir }}"
+
+- name: Save admin password in file
+  copy:
+    content: "{{ technitium_admin_password }}"
+    dest: "{{ technitium_admin_password_file }}"
+    mode: "0600"
+  no_log: true
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ technitium_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start technitium container
+  community.docker.docker_compose_v2:
+    project_src: "{{ technitium_service_dir }}"
+    state: present

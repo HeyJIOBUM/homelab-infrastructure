@@ -1,0 +1,76 @@
+- name: Login to technitium and obtain session token
+  uri:
+    url: "{{ technitium_addr }}/api/user/login"
+    method: GET
+    body_format: form-urlencoded
+    body:
+      user: admin
+      pass: "{{ technitium_admin_password }}"
+    return_content: yes
+    status_code: 200
+  register: technitium_login
+  until: technitium_login.json.status | default('') == "ok"
+  retries: 15
+  delay: 5
+  failed_when: false
+  no_log: true
+  changed_when: false
+
+- name: Create api token for dnsweaver if not exist
+  when: >
+    technitium_api_token is not defined or
+    technitium_api_token | length == 0
+  no_log: true
+  block:
+    - name: Create api token for dnsweaver
+      uri:
+        url: "{{ technitium_addr }}/api/user/createToken"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ technitium_login.json.token }}"
+        body_format: form-urlencoded
+        body:
+          tokenName: "dnsweaver"
+        return_content: yes
+      register: technitium_token_response
+
+    - name: Set technitium_api_token fact
+      set_fact:
+        technitium_api_token: "{{ technitium_token_response.json.token }}"
+
+    - name: Resolve values for vault data
+      set_fact:
+        technitium_vault_data: >-
+          {{
+            technitium_vault_data | default({})
+            | combine({ item.vault_name: lookup('ansible.builtin.vars', item.ansible_name) })
+          }}
+      loop: "{{ technitium_vault_secrets }}"
+      loop_control:
+        label: "{{ item.vault_name }}"
+
+    - name: Save technitium secrets to vault
+      community.hashi_vault.vault_kv2_write:
+        url: "{{ vault_addr }}"
+        ca_cert: "{{ step_ca_system_ca_path }}"
+        token: "{{ vault_token }}"
+        engine_mount_point: "{{ vault_kv_engine }}"
+        path: "{{ technitium_vault_path }}"
+        data: "{{ technitium_vault_data }}"
+
+- name: Create primary zone for homelab
+  uri:
+    url: "{{ technitium_addr }}/api/zones/create"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ technitium_login.json.token }}"
+    body_format: form-urlencoded
+    body:
+      zone: "homelab"
+      type: "Primary"
+    return_content: yes
+  register: technitium_zone
+  failed_when:
+    - technitium_zone.json.status != 'ok'
+    - "'already exists' not in technitium_zone.json.errorMessage | default('')"
+  no_log: true
