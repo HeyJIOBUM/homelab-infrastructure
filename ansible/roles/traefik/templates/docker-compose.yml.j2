@@ -1,0 +1,27 @@
+services:
+  traefik:
+    image: traefik:{{ traefic_tag }}
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.homelab`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls.certresolver=stepca"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:{{ traefik_api_password | password_hash('bcrypt') | replace('$', '$$') }}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ traefik_config_dir }}:/etc/traefik
+      - {{ traefik_config_dir }}/traefik.yml:/etc/traefik/traefik.yml:ro
+      - {{ step_ca_system_ca_path }}:/etc/traefik/step_ca_root.crt:ro
+    networks:
+      - {{ traefik_docker_network }}
+    restart: unless-stopped
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true

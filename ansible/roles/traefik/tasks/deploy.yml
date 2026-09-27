@@ -1,0 +1,39 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags: always
+
+- name: Get traefik secrets
+  include_role:
+    name: traefik
+    tasks_from: read_vault_secrets
+  tags: always
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ traefik_service_dir }}"
+    - "{{ traefik_config_dir }}"
+    - "{{ traefik_credentials_dir }}"
+
+- name: Create traefik config
+  template:
+    src: traefik.yml.j2
+    dest: "{{ traefik_config_dir }}/traefik.yml"
+    mode: "0644"
+  notify: restart traefik container
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ traefik_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start Traefik container
+  community.docker.docker_compose_v2:
+    project_src: "{{ traefik_service_dir }}"
+    state: present

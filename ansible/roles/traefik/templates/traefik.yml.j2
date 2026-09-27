@@ -1,0 +1,39 @@
+api:
+  dashboard: true
+  insecure: false
+
+providers:
+  docker:
+    exposedByDefault: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: ":443"
+    http:
+      tls: true
+
+certificatesResolvers:
+  stepca:
+    acme:
+      httpChallenge:
+        entryPoint: web
+      email: "kirill.nichinger@gmail.com"
+      storage: "/etc/traefik/acme.json"
+      caServer: "{{ step_ca_addr }}/acme/acme/directory"
+      caCertificates:
+        - /etc/traefik/step_ca_root.crt
+
+accesslog: true
+log:
+  level: debug
+
+metrics:
+  prometheus: true

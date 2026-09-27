@@ -11,8 +11,8 @@
           - vault_ansible_secret_id
       tags: always
   tasks:
-    - name: Deploy traefic
+    - name: Deploy traefik
       include_role:
-        name: traefic
+        name: traefik
         tasks_from: deploy
       tags: always
