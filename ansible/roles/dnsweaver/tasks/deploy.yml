@@ -1,0 +1,36 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+
+- name: Get technitium api token
+  include_role:
+    name: dnsweaver
+    tasks_from: read_vault_secrets
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ dnsweaver_service_dir }}"
+    - "{{ dnsweaver_credentials_dir }}"
+
+- name: Save api token in file
+  copy:
+    content: "{{ technitium_api_token }}"
+    dest: "{{ technitium_api_token_file }}"
+    mode: "0600"
+  no_log: true
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ dnsweaver_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start dnsweaver container
+  community.docker.docker_compose_v2:
+    project_src: "{{ dnsweaver_service_dir }}"
+    state: present

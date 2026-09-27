@@ -1,0 +1,23 @@
+services:
+  dnsweaver:
+    container_name: dnsweaver
+    image: maxamill/dnsweaver:{{ dnsweaver_tag }}
+    environment:
+      - DNSWEAVER_INSTANCES=internal-dns
+      - DNSWEAVER_INTERNAL_DNS_TYPE=technitium
+      - DNSWEAVER_INTERNAL_DNS_URL=http://dns.internal:5380
+      - DNSWEAVER_INTERNAL_DNS_TOKEN_FILE={{ technitium_container_api_token_file }}
+      - DNSWEAVER_INTERNAL_DNS_ZONE=home.example.com
+      - DNSWEAVER_INTERNAL_DNS_RECORD_TYPE=A
+      - DNSWEAVER_INTERNAL_DNS_TARGET=192.0.2.100
+      - DNSWEAVER_INTERNAL_DNS_DOMAINS=*.home.example.com
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ technitium_api_token_file }}:{{ technitium_container_api_token_file }}:ro
+    restart: unless-stopped
+    networks:
+      - {{ traefik_docker_network }}
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true

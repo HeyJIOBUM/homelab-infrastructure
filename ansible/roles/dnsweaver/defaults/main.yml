@@ -1,0 +1,15 @@
+# Dirs
+dnsweaver_service_dir: "{{ services_path }}/dnsweaver"
+dnsweaver_credentials_dir: "{{ dnsweaver_service_dir }}/credentials"
+
+technitium_api_token_file: "{{ dnsweaver_credentials_dir }}/api_token"
+technitium_container_api_token_file: "/etc/technitium/api_token"
+
+# config
+dnsweaver_tag: "v3.0.0"
+
+# vault
+technitium_vault_path: infra/technitium
+technitium_vault_secrets:
+  - ansible_name: technitium_api_token
+    vault_name: api_token
