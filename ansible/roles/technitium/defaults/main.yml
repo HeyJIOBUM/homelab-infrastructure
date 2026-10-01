@@ -18,14 +18,3 @@ technitium_vault_secrets:
   - ansible_name: technitium_api_token
     vault_name: api_token
     generator: ""
-
-# A records
-initial_dns_records:
-  - name: step-ca
-    addr: "{{ step_ca_ip }}"
-  - name: vault
-    addr: "{{ vault_ip }}"
-  - name: dns
-    addr: "{{ technitium_ip }}"
-  - name: traefik
-    addr: "{{ traefik_ip }}"

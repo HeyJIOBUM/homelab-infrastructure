@@ -75,23 +75,19 @@
     - "'already exists' not in technitium_zone.json.errorMessage | default('')"
   no_log: true
 
-- name: Add initial dns A records
+- name: Add docker network to dns acl
   uri:
-    url: "{{ technitium_addr }}/api/zones/records/add"
+    url: "{{ technitium_addr }}/api/settings/set"
     method: GET
     headers:
-      Authorization: "Bearer {{ technitium_api_token }}"
+      Authorization: "Bearer {{ technitium_login.json.token }}"
     body_format: form-urlencoded
     body:
-      domain: "{{ item.name }}.homelab"
-      zone: "homelab"
-      type: "A"
-      ipAddress: "{{ item.addr }}"
-      ttl: 3600
+      recursion: "UseSpecifiedNetworkACL"
+      recursionNetworkACL: "127.0.0.1,{{ traefik_network_subnet }}"
     return_content: yes
-  register: technitium_initial_records
-  loop: "{{ initial_dns_records }}"
+  register: technitium_dns_response
   failed_when:
-    - technitium_initial_records.json.status != 'ok'
-    - "'already exists' not in technitium_initial_records.json.errorMessage | default('')"
+    - technitium_dns_response.json.status != 'ok'
+    - "'already exists' not in technitium_dns_response.json.errorMessage | default('')"
   no_log: true
