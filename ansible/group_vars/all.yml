@@ -50,7 +50,10 @@ vault_admin_password: !vault |
   66333861323863643638663563393639663138623661306361613565663033356136
 
 # traefik
-traefik_docker_network: traefik
+traefik_docker_network: "traefik"
+traefik_network_subnet: "172.21.0.0/16"
+traefik_network_gateway: "172.21.0.1"
+
 traefik_ip: "{{ hostvars['vps1'].ansible_host }}"
 traefik_addr: "https://{{ traefik_ip }}"
 

@@ -58,6 +58,14 @@
         mode: "0644"
       notify: Restart docker
 
+    - name: Create basic docker network
+      community.docker.docker_network:
+        name: "{{ traefik_docker_network }}"
+        ipam_config:
+          - subnet: "{{ traefik_network_subnet }}"
+            gateway: "{{ traefik_network_gateway }}"
+        state: present
+
     - name: Ensure Docker service is enabled and started
       service:
         name: docker

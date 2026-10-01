@@ -30,11 +30,6 @@
   when: not step_ca_pass_stat.stat.exists
   no_log: true
 
-- name: Ensure traefik network exists
-  community.docker.docker_network:
-    name: "{{ traefik_docker_network }}"
-    state: present
-
 - name: Create Docker Compose file
   template:
     src: docker-compose.yml.j2
