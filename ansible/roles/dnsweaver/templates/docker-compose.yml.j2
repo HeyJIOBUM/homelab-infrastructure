@@ -5,12 +5,12 @@ services:
     environment:
       - DNSWEAVER_INSTANCES=internal-dns
       - DNSWEAVER_INTERNAL_DNS_TYPE=technitium
-      - DNSWEAVER_INTERNAL_DNS_URL=http://dns.internal:5380
+      - DNSWEAVER_INTERNAL_DNS_URL={{ technitium_addr }}
       - DNSWEAVER_INTERNAL_DNS_TOKEN_FILE={{ technitium_container_api_token_file }}
-      - DNSWEAVER_INTERNAL_DNS_ZONE=home.example.com
+      - DNSWEAVER_INTERNAL_DNS_ZONE={{ technitium_dns_zone }}
       - DNSWEAVER_INTERNAL_DNS_RECORD_TYPE=A
-      - DNSWEAVER_INTERNAL_DNS_TARGET=192.0.2.100
-      - DNSWEAVER_INTERNAL_DNS_DOMAINS=*.home.example.com
+      - DNSWEAVER_INTERNAL_DNS_TARGET={{ traefik_ip }}
+      - DNSWEAVER_INTERNAL_DNS_DOMAINS=*.{{ technitium_dns_zone }}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - {{ technitium_api_token_file }}:{{ technitium_container_api_token_file }}:ro
