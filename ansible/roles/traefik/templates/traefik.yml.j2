@@ -4,7 +4,7 @@ api:
 
 providers:
   docker:
-    exposedByDefault: true
+    exposedByDefault: false
 
 entryPoints:
   web:
@@ -33,7 +33,7 @@ certificatesResolvers:
 
 accesslog: true
 log:
-  level: debug
+  level: info
 
 metrics:
   prometheus: true
