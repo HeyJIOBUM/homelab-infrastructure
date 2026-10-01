@@ -74,3 +74,24 @@
     - technitium_zone.json.status != 'ok'
     - "'already exists' not in technitium_zone.json.errorMessage | default('')"
   no_log: true
+
+- name: Add initial dns A records
+  uri:
+    url: "{{ technitium_addr }}/api/zones/records/add"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ technitium_api_token }}"
+    body_format: form-urlencoded
+    body:
+      domain: "{{ item.name }}.homelab"
+      zone: "homelab"
+      type: "A"
+      ipAddress: "{{ item.addr }}"
+      ttl: 3600
+    return_content: yes
+  register: technitium_initial_records
+  loop: "{{ initial_dns_records }}"
+  failed_when:
+    - technitium_initial_records.json.status != 'ok'
+    - "'already exists' not in technitium_initial_records.json.errorMessage | default('')"
+  no_log: true
