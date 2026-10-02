@@ -17,6 +17,12 @@ services:
     networks:
       {{ traefik_docker_network }}:
         ipv4_address: {{ technitium_docker_ip }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.technitium.rule=Host(`dns.homelab`)"
+      - "traefik.http.routers.technitium.entrypoints=websecure"
+      - "traefik.http.routers.technitium.tls.certresolver=stepca"
+      - "traefik.http.services.technitium.loadbalancer.server.port={{ technitium_api_port }}"
 
 networks:
   {{ traefik_docker_network }}:
