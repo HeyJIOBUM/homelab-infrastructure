@@ -27,6 +27,13 @@
     mode: "0644"
   notify: restart traefik container
 
+- name: Create dynamic config
+  template:
+    src: dynamic.yml.j2
+    dest: "{{ traefik_config_dir }}/dynamic.yml"
+    mode: "0644"
+  notify: restart traefik container
+
 - name: Create Docker Compose
   template:
     src: docker-compose.yml.j2

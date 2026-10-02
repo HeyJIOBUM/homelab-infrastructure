@@ -5,6 +5,9 @@ api:
 providers:
   docker:
     exposedByDefault: false
+  file:
+    filename: "/etc/traefik/dynamic.yml"
+    watch: true
 
 entryPoints:
   web:
@@ -23,6 +26,7 @@ entryPoints:
 certificatesResolvers:
   stepca:
     acme:
+      certificatesDuration: 72
       httpChallenge:
         entryPoint: web
       email: "kirill.nichinger@gmail.com"
