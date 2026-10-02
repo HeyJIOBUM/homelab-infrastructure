@@ -15,7 +15,8 @@ services:
       - {{ technitium_admin_password_file }}:{{ technitium_container_admin_password_file }}:ro
     restart: unless-stopped
     networks:
-      - {{ traefik_docker_network }}
+      {{ traefik_docker_network }}:
+        ipv4_address: {{ technitium_docker_ip }}
 
 networks:
   {{ traefik_docker_network }}:
