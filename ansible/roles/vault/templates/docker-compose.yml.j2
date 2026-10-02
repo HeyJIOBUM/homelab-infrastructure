@@ -14,10 +14,26 @@ services:
     
     ports:
       - "{{ vault_port }}:{{ vault_port }}"
-    
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vault.rule=Host(`vault.homelab`)"
+      - "traefik.http.routers.vault.entrypoints=websecure"
+      - "traefik.http.routers.vault.tls.certresolver=stepca"
+      - "traefik.http.services.vault.loadbalancer.server.port={{ vault_port }}"
+      - "traefik.http.services.vault.loadbalancer.server.scheme={{ vault_proto }}"
+      - "traefik.http.services.vault.loadBalancer.serversTransport=stepca@file"
+
     volumes:
       - {{ vault_config_dir }}:/vault/config:ro
       - {{ vault_data_dir }}:/vault/data
       - {{ vault_tls_dir }}:/vault/tls:ro
-    
+
+    networks:
+      - {{ traefik_docker_network }}
+
     command: server
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true
