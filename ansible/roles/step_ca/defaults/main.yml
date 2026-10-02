@@ -46,8 +46,8 @@ step_ca_init_ssh: "false"
 # acme provisioner
 step_ca_acme_provisioner_name: "acme"
 step_ca_acme_password_file: "{{ step_ca_init_password_file }}"
-step_ca_acme_default_duration: "72h"
-step_ca_acme_max_duration: "72h"
+step_ca_acme_default_duration: "720h"
+step_ca_acme_max_duration: "720h"
 
 # jwk provisioner
 step_ca_jwk_provisioner_name: "{{ step_ca_init_jwk_provisioner_name }}"
