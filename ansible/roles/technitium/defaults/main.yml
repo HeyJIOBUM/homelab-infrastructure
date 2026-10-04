@@ -9,6 +9,11 @@ technitium_container_admin_password_file: "/etc/technitium/admin_password"
 # config
 technitium_tag: "15.5.1"
 
+# blocking
+blocking_type: "NxDomain"
+block_list_urls:
+  - https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling/hosts
+
 # vault
 technitium_vault_path: infra/technitium
 technitium_vault_secrets:
