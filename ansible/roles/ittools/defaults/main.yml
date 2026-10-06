@@ -1,0 +1,7 @@
+# Dirs
+ittools_service_dir: "{{ services_path }}/ittools"
+
+# config
+ittools_tag: "latest"
+
+ittools_port: "5000"

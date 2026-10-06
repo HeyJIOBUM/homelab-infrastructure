@@ -1,0 +1,18 @@
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ittools_service_dir }}"
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ ittools_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start ittools container
+  community.docker.docker_compose_v2:
+    project_src: "{{ ittools_service_dir }}"
+    state: present
