@@ -1,0 +1,27 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags:
+    - always
+
+- name: Get zabbix secrets
+  include_role:
+    name: zabbix
+    tasks_from: read_vault_secrets
+  tags:
+    - always
+
+- name: Install zabbix
+  include_tasks: 
+    file: deploy/install.yml
+    apply:
+      tags: zabbix-install
+  tags: zabbix-install
+
+- name: Configure zabbix
+  include_tasks: 
+    file: deploy/configure.yml
+    apply:
+      tags: zabbix-configure
+  tags: zabbix-configure

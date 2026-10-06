@@ -1,0 +1,18 @@
+- name: Change default Admin password
+  community.zabbix.zabbix_user:
+    username: Admin
+    current_passwd: zabbix
+    passwd: "{{ zabbix_admin_password }}"
+    override_passwd: true
+    usrgrps:
+      - "Zabbix administrators"
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: "{{ zabbix_web_port }}"
+    ansible_httpapi_use_ssl: false
+    ansible_host: "{{ zabbix_ip }}"
+    ansible_user: Admin
+    ansible_password: zabbix
+    ansible_zabbix_url_path: ""
+  no_log: true

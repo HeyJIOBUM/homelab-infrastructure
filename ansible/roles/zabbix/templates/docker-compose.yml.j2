@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: "postgres:16-alpine"
+    container_name: zabbix-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zabbix
+      POSTGRES_DB: zabbix
+    env_file:
+      - ./zabbix.env
+    volumes:
+      - "{{ zabbix_data_dir }}/postgres:/var/lib/postgresql/data"
+    networks:
+      - {{ traefik_docker_network }}
+    dns:
+      - "{{ technitium_docker_ip }}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zabbix -d zabbix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  zabbix-server:
+    image: "zabbix/zabbix-server-pgsql:alpine-{{ zabbix_image_tag }}"
+    container_name: zabbix-server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_SERVER_HOST: postgres
+      POSTGRES_USER: zabbix
+      POSTGRES_DB: zabbix
+      ZBX_CACHESIZE: 64M
+      ZBX_HISTORYCACHESIZE: 32M
+    env_file:
+      - ./zabbix.env
+    networks:
+      - {{ traefik_docker_network }}
+    dns:
+      - "{{ technitium_docker_ip }}"
+
+  zabbix-web:
+    image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ zabbix_image_tag }}"
+    container_name: zabbix-web
+    restart: unless-stopped
+    ports:
+      - "{{ zabbix_web_port }}:8080"
+    depends_on:
+      - zabbix-server
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      DB_SERVER_HOST: postgres
+      POSTGRES_USER: zabbix
+      POSTGRES_DB: zabbix
+      PHP_TZ: "{{ zabbix_timezone }}"
+    env_file:
+      - ./zabbix.env
+    networks:
+      - {{ traefik_docker_network }}
+    dns:
+      - "{{ technitium_docker_ip }}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zabbix.rule=Host(`zabbix.{{ technitium_dns_zone }}`)"
+      - "traefik.http.routers.zabbix.entrypoints=websecure"
+      - "traefik.http.routers.zabbix.tls.certresolver=stepca"
+      - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
+
+  zabbix-agent:
+    image: "zabbix/zabbix-agent2:alpine-{{ zabbix_image_tag }}"
+    container_name: zabbix-agent
+    restart: unless-stopped
+    depends_on:
+      - zabbix-server
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_HOSTNAME: zabbix-agent
+    networks:
+      - {{ traefik_docker_network }}
+    dns:
+      - "{{ technitium_docker_ip }}"
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true
