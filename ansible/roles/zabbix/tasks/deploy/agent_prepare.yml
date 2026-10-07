@@ -1,0 +1,46 @@
+- name: Download Zabbix repository package
+  get_url:
+    url: "https://repo.zabbix.com/zabbix/{{ zabbix_version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix_version }}+ubuntu24.04_all.deb"
+    dest: /tmp/zabbix-release.deb
+    mode: "0644"
+
+- name: Install Zabbix repository package
+  apt:
+    deb: /tmp/zabbix-release.deb
+    state: present
+
+- name: Update apt cache
+  apt:
+    update_cache: true
+
+- name: Install zabbix-agent2 with plugins
+  apt:
+    name: 
+      - zabbix-agent2
+      - zabbix-agent2-plugin-postgresql
+    state: present
+
+- name: Configure Zabbix agent
+  lineinfile:
+    path: /etc/zabbix/zabbix_agent2.conf
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+    backup: true
+  loop:
+    - { key: "Server",       value: "{{ zabbix_ip }},{{ traefik_network_subnet }}" }
+    - { key: "ServerActive", value: "{{ zabbix_ip }}" }
+    - { key: "Hostname",     value: "{{ zabbix_default_hostname }}" }
+  notify: restart zabbix-agent2
+
+- name: Add zabbix user to docker group
+  user:
+    name: zabbix
+    groups: docker
+    append: true
+  notify: restart zabbix-agent2
+
+- name: Enable and start zabbix-agent2
+  systemd:
+    name: zabbix-agent2
+    state: started
+    enabled: true

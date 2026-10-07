@@ -3,14 +3,17 @@ zabbix_service_dir: "{{ services_path }}/zabbix"
 zabbix_data_dir: "{{ zabbix_service_dir }}/data"
 zabbix_credentials_dir: "{{ zabbix_service_dir }}/credentials"
 
-# Image
-zabbix_image_tag: "7.4-latest"
+zabbix_token_file: "{{ zabbix_credentials_dir }}/zabbix_api_token"
 
-# Ports
-zabbix_web_port: "5050"
+# Image
+zabbix_version: "7.4"
+zabbix_image_tag: "{{ zabbix_version }}-latest"
 
 # Timezone
 zabbix_timezone: "Europe/Minsk"
+
+# Config
+zabbix_default_hostname: "vps1"
 
 # Vault
 zabbix_vault_path: infra/zabbix
@@ -21,3 +24,9 @@ zabbix_vault_secrets:
   - ansible_name: zabbix_admin_password
     vault_name: admin_password
     generator: "{{ lookup('pipe', 'openssl rand -hex 16') }}"
+  - ansible_name: zabbix_pg_monitor_password
+    vault_name: pg_monitor_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 16') }}"
+  - ansible_name: zabbix_api_token
+    vault_name: api_token
+    generator: ""

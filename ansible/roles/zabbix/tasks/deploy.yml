@@ -12,6 +12,13 @@
   tags:
     - always
 
+- name: Prepare agent
+  include_tasks: 
+    file: deploy/agent_prepare.yml
+    apply:
+      tags: zabbix-agent
+  tags: zabbix-agent
+
 - name: Install zabbix
   include_tasks: 
     file: deploy/install.yml
@@ -19,9 +26,16 @@
       tags: zabbix-install
   tags: zabbix-install
 
-- name: Configure zabbix
+- name: Configure agent plugins
   include_tasks: 
-    file: deploy/configure.yml
+    file: deploy/configure_plugins.yml
     apply:
-      tags: zabbix-configure
-  tags: zabbix-configure
+      tags: zabbix-plugins
+  tags: zabbix-plugins
+
+- name: Configure zabbix server
+  include_tasks: 
+    file: deploy/configure_server.yml
+    apply:
+      tags: zabbix-server
+  tags: zabbix-server

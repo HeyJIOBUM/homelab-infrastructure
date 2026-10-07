@@ -3,6 +3,8 @@ services:
     image: "postgres:16-alpine"
     container_name: zabbix-postgres
     restart: unless-stopped
+    ports:
+      - "{{ zabbix_postgress_port }}:5432"
     environment:
       POSTGRES_USER: zabbix
       POSTGRES_DB: zabbix
@@ -66,20 +68,6 @@ services:
       - "traefik.http.routers.zabbix.entrypoints=websecure"
       - "traefik.http.routers.zabbix.tls.certresolver=stepca"
       - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
-
-  zabbix-agent:
-    image: "zabbix/zabbix-agent2:alpine-{{ zabbix_image_tag }}"
-    container_name: zabbix-agent
-    restart: unless-stopped
-    depends_on:
-      - zabbix-server
-    environment:
-      ZBX_SERVER_HOST: zabbix-server
-      ZBX_HOSTNAME: zabbix-agent
-    networks:
-      - {{ traefik_docker_network }}
-    dns:
-      - "{{ technitium_docker_ip }}"
 
 networks:
   {{ traefik_docker_network }}:

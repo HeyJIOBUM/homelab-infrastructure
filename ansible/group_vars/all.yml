@@ -67,6 +67,7 @@ technitium_ip: "{{ hostvars['vps1'].ansible_host }}"
 technitium_addr: "http://{{ technitium_ip }}:{{ technitium_api_port }}"
 
 # zabbix
+zabbix_postgress_port: "5432"
 
 zabbix_web_port: "5050"
 zabbix_ip: "{{ hostvars['vps1'].ansible_host }}"

@@ -1,0 +1,293 @@
+- name: Decide if token generation is needed
+  set_fact:
+    zabbix_genereate_token: "{{ zabbix_api_token is not defined or zabbix_api_token | length == 0 }}"
+
+- name: Generate api token if not exist
+  when: zabbix_genereate_token == true
+  block:
+    - name: Login with default password
+      uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "user.login"
+          params:
+            username: "Admin"
+            password: "zabbix"
+          id: 1
+        status_code: 200
+        return_content: true
+      register: zabbix_login_default
+      no_log: true
+
+    - name: Change Admin password
+      uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_login_default.json.result }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "user.update"
+          params:
+            userid: "1"
+            current_passwd: "zabbix"
+            passwd: "{{ zabbix_admin_password }}"
+          id: 2
+        status_code: 200
+        return_content: true
+      register: zabbix_password_change
+      when: zabbix_login_default.json.error is not defined
+      no_log: true
+
+    - name: Login with target password
+      uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "user.login"
+          params:
+            username: "Admin"
+            password: "{{ zabbix_admin_password }}"
+          id: 3
+        status_code: 200
+        return_content: true
+      register: zabbix_login_final
+      no_log: true
+
+    - name: Create API token
+      uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_login_final.json.result }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "token.create"
+          params:
+            name: "ansible-automation"
+            userid: "1"
+          id: 4
+        status_code: 200
+        return_content: true
+      register: zabbix_token_create
+      no_log: true
+
+    - name: Generate API token
+      uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_login_final.json.result }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "token.generate"
+          params: "{{ zabbix_token_create.json.result.tokenids }}"
+          id: 5
+        status_code: 200
+        return_content: true
+      register: zabbix_token_generate
+      no_log: true
+
+    - name: Set token fact
+      set_fact:
+        zabbix_api_token: "{{ zabbix_token_generate.json.result[0].token }}"
+      no_log: true
+
+    - name: Save API token to file
+      copy:
+        content: "{{ zabbix_api_token }}"
+        dest: "{{ zabbix_token_file }}"
+        mode: "0600"
+      no_log: true
+
+    - name: Resolve values for vault data
+      set_fact:
+        zabbix_vault_data: >-
+          {{
+            zabbix_vault_data | default({})
+            | combine({ item.vault_name: lookup('ansible.builtin.vars', item.ansible_name) })
+          }}
+      loop: "{{ zabbix_vault_secrets }}"
+      loop_control:
+        label: "{{ item.vault_name }}"
+
+    - name: Save zabbix secrets with token to vault
+      community.hashi_vault.vault_kv2_write:
+        url: "{{ vault_addr }}"
+        ca_cert: "{{ step_ca_system_ca_path }}"
+        token: "{{ vault_token }}"
+        engine_mount_point: "{{ vault_kv_engine }}"
+        path: "{{ zabbix_vault_path }}"
+        data: "{{ zabbix_vault_data }}"
+
+- name: Get "Zabbix server" host
+  uri:
+    url: "{{ zabbix_addr }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: "application/json-rpc"
+      Authorization: "Bearer {{ zabbix_api_token }}"
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "host.get"
+      params:
+        output: ["hostid", "host"]
+        filter:
+          host: ["Zabbix server"]
+      id: 10
+    status_code: 200
+  register: zabbix_default_host
+
+- name: Configure "Zabbix server" default host if exist
+  when: zabbix_default_host.json.result | length != 0
+  block:
+    - name: Get template ids
+      ansible.builtin.uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_api_token }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "template.get"
+          params:
+            output: ["templateid", "host"]
+            filter:
+              host:
+                - "Linux by Zabbix agent"
+                - "Docker by Zabbix agent 2"
+                - "PostgreSQL by Zabbix agent 2"
+          id: 11
+        status_code: 200
+        return_content: true
+      register: zabbix_templates_get
+
+    - name: Set template id list
+      ansible.builtin.set_fact:
+        zabbix_template_ids: >-
+          {{
+            zabbix_templates_get.json.result
+            | map(attribute='templateid')
+            | map('community.general.dict_kv', 'templateid')
+            | list
+          }}
+
+    - name: Get interface id
+      ansible.builtin.uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_api_token }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "hostinterface.get"
+          params:
+            hostids: "{{ zabbix_default_host.json.result[0].hostid }}"
+          id: 11
+        status_code: 200
+        return_content: true
+      register: zabbix_hostinterface_get  
+
+    - name: Set interface id
+      ansible.builtin.set_fact:
+        zabbix_interface_id: "{{ zabbix_hostinterface_get.json.result[0].interfaceid }}"
+
+    - name: Unlink and clear all templates
+      ansible.builtin.uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_api_token }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "host.update"
+          params:
+            hostid: "{{ zabbix_default_host.json.result[0].hostid }}"
+            templates: []
+            templates_clear: "{{ zabbix_template_ids }}"
+          id: 12
+        status_code: 200
+        return_content: true
+      register: zabbix_unlink_clear
+
+    - name: Update agent interface
+      ansible.builtin.uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_api_token }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "hostinterface.update"
+          params:
+            interfaceid: "{{ zabbix_interface_id }}"
+            useip: 1
+            ip: "{{ zabbix_ip }}"
+            dns: ""
+            port: "10050"
+          id: 13
+        status_code: 200
+        return_content: true
+      register: zabbix_iface_update
+
+    - name: Rename host
+      ansible.builtin.uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_api_token }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "host.update"
+          params:
+            hostid: "{{ zabbix_default_host.json.result[0].hostid }}"
+            host: "{{ zabbix_default_hostname }}"
+          id: 14
+        status_code: 200
+        return_content: true
+      register: zabbix_rename
+
+    - name: Link templates
+      ansible.builtin.uri:
+        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: "application/json-rpc"
+          Authorization: "Bearer {{ zabbix_api_token }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "host.update"
+          params:
+            hostid: "{{ zabbix_default_host.json.result[0].hostid }}"
+            templates: "{{ zabbix_template_ids }}"
+          id: 15
+        status_code: 200
+        return_content: true
+      register: zabbix_link_templates
