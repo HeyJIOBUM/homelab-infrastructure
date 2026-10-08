@@ -41,6 +41,12 @@ services:
       - {{ traefik_docker_network }}
     dns:
       - "{{ technitium_docker_ip }}"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 10051 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
 
   zabbix-web:
     image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ zabbix_image_tag }}"
@@ -49,7 +55,8 @@ services:
     ports:
       - "{{ zabbix_web_port }}:8080"
     depends_on:
-      - zabbix-server
+      zabbix-server:
+        condition: service_healthy
     environment:
       ZBX_SERVER_HOST: zabbix-server
       DB_SERVER_HOST: postgres

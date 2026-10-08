@@ -1,32 +1,18 @@
-- name: Create Zabbix monitoring user in PostgreSQL
+- name: Create or update Zabbix monitoring user in PostgreSQL
   shell: |
     docker exec -i zabbix-postgres psql -U zabbix -d zabbix <<'EOF'
     DO $$
     BEGIN
       IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'zbx_monitor') THEN
         CREATE USER zbx_monitor WITH PASSWORD '{{ zabbix_pg_monitor_password }}' INHERIT;
+      ELSE
+        ALTER USER zbx_monitor WITH PASSWORD '{{ zabbix_pg_monitor_password }}';
       END IF;
     END
     $$;
     GRANT pg_monitor TO zbx_monitor;
     EOF
   no_log: true
-
-- name: Check if zbx_monitor rule already exists
-  ansible.builtin.shell: |
-    docker exec -i zabbix-postgres grep -q '^host all zbx_monitor 0.0.0.0/0 md5$' /var/lib/postgresql/data/pg_hba.conf
-  register: pg_hba_check
-  changed_when: false
-  failed_when: false
-
-- name: Add zbx_monitor rule to pg_hba.conf
-  ansible.builtin.shell: |
-    docker exec -i zabbix-postgres bash -c "echo 'host all zbx_monitor 0.0.0.0/0 md5' >> /var/lib/postgresql/data/pg_hba.conf"
-  when: pg_hba_check.rc != 0
-
-- name: Reload PostgreSQL config
-  shell: |
-    docker exec zabbix-postgres psql -U zabbix -d zabbix -c "SELECT pg_reload_conf();"
 
 - name: Configure PostgreSQL plugin for Zabbix agent
   copy:
