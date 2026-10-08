@@ -1,6 +1,27 @@
+- name: Check if existing token is valid
+  ansible.builtin.uri:
+    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: "application/json-rpc"
+      Authorization: "Bearer {{ zabbix_api_token }}"
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "host.get"
+      params:
+        output: ["hostid"]
+        limit: 1
+      id: 1
+    status_code: 200
+  register: zabbix_token_check
+  when: zabbix_api_token | length > 0
+  failed_when: false
+  no_log: true
+
 - name: Decide if token generation is needed
   set_fact:
-    zabbix_genereate_token: "{{ zabbix_api_token is not defined or zabbix_api_token | length == 0 }}"
+    zabbix_genereate_token: "{{ zabbix_api_token | length == 0 or zabbix_token_check.json.error is defined }}"
 
 - name: Generate api token if not exist
   when: zabbix_genereate_token == true

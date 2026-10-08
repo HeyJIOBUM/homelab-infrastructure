@@ -8,6 +8,7 @@
   apt:
     deb: /tmp/zabbix-release.deb
     state: present
+    force: true
 
 - name: Update apt cache
   apt:
@@ -42,5 +43,5 @@
 - name: Enable and start zabbix-agent2
   systemd:
     name: zabbix-agent2
-    state: started
+    state: restarted
     enabled: true
