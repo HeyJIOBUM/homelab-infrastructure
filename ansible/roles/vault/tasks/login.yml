@@ -1,8 +1,15 @@
 - name: Vault login
   block:
-    - name: Load AppRole credentials from file
-      include_vars:
-        file: "{{ vault_ansible_creds_file }}"
+    - name: Read AppRole credentials file from remote
+      slurp:
+        src: "{{ vault_ansible_creds_file }}"
+      register: approle_creds_raw
+      no_log: true
+
+    - name: Parse AppRole credentials from file
+      set_fact:
+        vault_ansible_role_id: "{{ (approle_creds_raw.content | b64decode | from_yaml).vault_ansible_role_id }}"
+        vault_ansible_secret_id: "{{ (approle_creds_raw.content | b64decode | from_yaml).vault_ansible_secret_id }}"
       no_log: true
 
     - name: Assert AppRole credentials are available
