@@ -1,5 +1,19 @@
 - name: Vault login
   block:
+    - name: Load AppRole credentials from file
+      include_vars:
+        file: "{{ vault_ansible_creds_file }}"
+      no_log: true
+
+    - name: Assert AppRole credentials are available
+      assert:
+        that:
+          - vault_ansible_role_id is defined and vault_ansible_role_id | length > 0
+          - vault_ansible_secret_id is defined and vault_ansible_secret_id | length > 0
+        fail_msg: >-
+          vault_ansible_role_id and vault_ansible_secret_id are not set
+      no_log: true
+
     - name: Login to vault as ansible
       community.hashi_vault.vault_login:
         url: "{{ vault_addr }}"

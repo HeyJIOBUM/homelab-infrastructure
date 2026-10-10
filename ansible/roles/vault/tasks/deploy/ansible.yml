@@ -94,13 +94,10 @@
       # Ansible AppRole credentials
       # Generated: {{ ansible_facts.date_time.iso8601 }}
       #
-      # Next:
-      # - use commands
-      # - set password
-      # - save in all.yml
-      #
-      ansible-vault encrypt_string '{{ ansible_role_id.stdout }}' --name 'vault_ansible_role_id'
-      ansible-vault encrypt_string '{{ ansible_secret_id.stdout }}' --name 'vault_ansible_secret_id'
+      vault_ansible_role_id: "{{ ansible_role_id.stdout }}"
+      vault_ansible_secret_id: "{{ ansible_secret_id.stdout }}"
     dest: "{{ vault_ansible_creds_file }}"
+    owner: root
+    group: root
     mode: "0600"
   no_log: true

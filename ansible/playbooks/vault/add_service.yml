@@ -10,8 +10,6 @@
       vars:
         preflight_required_vars:
           - service_name
-          - vault_ansible_role_id
-          - vault_ansible_secret_id
   tasks:
     - name: Add vault service
       include_role:

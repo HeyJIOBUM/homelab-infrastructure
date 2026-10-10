@@ -86,7 +86,7 @@
   failed_when:
     - technitium_dns_response.json.status != 'ok'
     - "'already exists' not in technitium_dns_response.json.errorMessage | default('')"
-  # no_log: true
+  no_log: true
 
 - name: Enable ads block
   uri:
