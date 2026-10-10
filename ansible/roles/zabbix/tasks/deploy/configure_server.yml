@@ -1,5 +1,5 @@
 - name: Check if existing token is valid
-  ansible.builtin.uri:
+  uri:
     url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
@@ -179,7 +179,7 @@
   when: zabbix_default_host.json.result | length != 0
   block:
     - name: Get template ids
-      ansible.builtin.uri:
+      uri:
         url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
@@ -202,7 +202,7 @@
       register: zabbix_templates_get
 
     - name: Set template id list
-      ansible.builtin.set_fact:
+      set_fact:
         zabbix_template_ids: >-
           {{
             zabbix_templates_get.json.result
@@ -212,7 +212,7 @@
           }}
 
     - name: Get interface id
-      ansible.builtin.uri:
+      uri:
         url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
@@ -230,11 +230,11 @@
       register: zabbix_hostinterface_get  
 
     - name: Set interface id
-      ansible.builtin.set_fact:
+      set_fact:
         zabbix_interface_id: "{{ zabbix_hostinterface_get.json.result[0].interfaceid }}"
 
     - name: Unlink and clear all templates
-      ansible.builtin.uri:
+      uri:
         url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
@@ -254,7 +254,7 @@
       register: zabbix_unlink_clear
 
     - name: Update agent interface
-      ansible.builtin.uri:
+      uri:
         url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
@@ -276,7 +276,7 @@
       register: zabbix_iface_update
 
     - name: Rename host
-      ansible.builtin.uri:
+      uri:
         url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
@@ -295,7 +295,7 @@
       register: zabbix_rename
 
     - name: Link templates
-      ansible.builtin.uri:
+      uri:
         url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
