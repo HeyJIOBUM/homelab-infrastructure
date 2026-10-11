@@ -4,12 +4,3 @@ ittools_service_dir: "{{ services_path }}/ittools"
 # config
 ittools_tag: "latest"
 ittools_port: "5000"
-
-#---------------------------------------------------------
-# undeploy
-undeploy_level: none
-undeploy_levels:
-  none: 0      # default
-  stop: 1      # stop container
-  wipe: 2      # stop container + wipe service data
-  restore: 3   # stop container + wipe service data + restore the pre-deployment state

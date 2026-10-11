@@ -13,12 +13,3 @@ technitium_vault_path: infra/technitium
 technitium_vault_secrets:
   - ansible_name: technitium_api_token
     vault_name: api_token
-
-#---------------------------------------------------------
-# undeploy
-undeploy_level: none
-undeploy_levels:
-  none: 0      # default
-  stop: 1      # stop container
-  wipe: 2      # stop container + wipe service data
-  restore: 3   # stop container + wipe service data + restore the pre-deployment state
