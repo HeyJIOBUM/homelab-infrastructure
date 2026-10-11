@@ -9,8 +9,8 @@ traefic_tag: "v3.7"
 # vault
 traefik_vault_path: infra/traefik
 traefik_vault_secrets:
-  - ansible_name: traefik_api_password
-    vault_name: api_password
+  - ansible_name: traefik_admin_password
+    vault_name: admin_password
     generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
 
 #---------------------------------------------------------

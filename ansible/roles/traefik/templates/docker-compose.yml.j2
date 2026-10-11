@@ -13,7 +13,7 @@ services:
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls.certresolver=stepca"
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
-      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:{{ traefik_api_password | password_hash('bcrypt') | replace('$', '$$') }}"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:{{ traefik_admin_password | password_hash('bcrypt') | replace('$', '$$') }}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - {{ traefik_config_dir }}:/etc/traefik
