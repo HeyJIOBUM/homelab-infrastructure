@@ -1,0 +1,8 @@
+- name: Undeploy technitium
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy technitium
+      include_role:
+        name: technitium
+        tasks_from: undeploy

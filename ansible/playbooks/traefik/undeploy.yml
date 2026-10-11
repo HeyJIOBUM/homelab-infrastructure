@@ -1,0 +1,8 @@
+- name: Undeploy traefik
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy traefik
+      include_role:
+        name: traefik
+        tasks_from: undeploy

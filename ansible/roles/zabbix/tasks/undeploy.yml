@@ -1,0 +1,74 @@
+- name: Check if zabbix compose file exists
+  stat:
+    path: "{{ zabbix_service_dir }}/docker-compose.yml"
+  register: zabbix_compose
+
+- name: Stop zabbix stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ zabbix_service_dir }}"
+    state: absent
+    remove_volumes: "{{ undeploy_levels[undeploy_level] >= undeploy_levels.wipe }}"
+  when:
+    - undeploy_levels[undeploy_level] >= undeploy_levels.stop
+    - zabbix_compose.stat.exists
+
+- name: Remove zabbix service directory
+  file:
+    path: "{{ zabbix_service_dir }}"
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.wipe
+
+- name: Stop and disable zabbix-agent2
+  systemd:
+    name: zabbix-agent2
+    state: stopped
+    enabled: false
+  failed_when: false
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+
+- name: Remove zabbix agent plugin config
+  file:
+    path: /etc/zabbix/zabbix_agent2.d/plugins.d/postgresql.conf
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+
+- name: Remove zabbix agent config
+  file:
+    path: /etc/zabbix/zabbix_agent2.conf
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+
+- name: Remove zabbix-agent2 and plugins
+  apt:
+    name:
+      - zabbix-agent2
+      - zabbix-agent2-plugin-postgresql
+    state: absent
+    purge: true
+    autoremove: true
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+
+- name: Remove zabbix-release package
+  apt:
+    name: zabbix-release
+    state: absent
+    purge: true
+  failed_when: false
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+
+- name: Remove zabbix apt repository files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/zabbix.list
+    - /etc/apt/sources.list.d/zabbix.sources
+    - /usr/share/keyrings/zabbix-archive-keyring.gpg
+    - /etc/apt/trusted.gpg.d/zabbix-archive-keyring.gpg
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+  register: zabbix_apt_files_removed
+
+- name: Update apt cache after removing zabbix repository
+  apt:
+    update_cache: true
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore

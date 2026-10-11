@@ -1,0 +1,96 @@
+- name: Check if step_ca compose file exists
+  stat:
+    path: "{{ step_ca_service_dir }}/docker-compose.yml"
+  register: step_ca_compose
+
+- name: Stop step_ca container
+  community.docker.docker_compose_v2:
+    project_src: "{{ step_ca_service_dir }}"
+    state: absent
+  when:
+    - undeploy_levels[undeploy_level] >= undeploy_levels.stop
+    - step_ca_compose.stat.exists
+
+- name: Remove step_ca service directory
+  file:
+    path: "{{ step_ca_service_dir }}"
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.wipe
+
+- name: Remove step-cli package
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+  block:
+    - name: Check if step-cli is installed
+      command:
+        cmd: dpkg-query -W -f='${Status}' step-cli
+      register: step_ca_step_cli_status
+      changed_when: false
+      failed_when: false
+
+    - name: Remove step-cli
+      apt:
+        name: step-cli
+        state: absent
+        purge: true
+        autoremove: true
+      when: "'install ok installed' in step_ca_step_cli_status.stdout"
+
+    - name: Remove Smallstep APT repository
+      file:
+        path: /etc/apt/sources.list.d/smallstep.sources
+        state: absent
+      register: step_ca_apt_repo_removed
+
+    - name: Remove Smallstep APT signing key
+      file:
+        path: /etc/apt/keyrings/smallstep.asc
+        state: absent
+      register: step_ca_apt_key_removed
+
+    - name: Update apt cache after removing repository
+      apt:
+        update_cache: true
+
+- name: Untrust root CA from system trust store
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore
+  block:
+    - name: Check if CA exists in target trust store
+      stat:
+        path: "{{ step_ca_system_ca_path }}"
+      register: step_ca_target_ca_stat
+
+    - name: Remove root CA from target trust store
+      file:
+        path: "{{ step_ca_system_ca_path }}"
+        state: absent
+      when: step_ca_target_ca_stat.stat.exists
+      register: step_ca_target_ca_removed
+
+    - name: Update ca certificates on target host
+      command:
+        cmd: update-ca-certificates --fresh
+      when: step_ca_target_ca_removed.changed
+      changed_when: true
+
+    - name: Remove CA from controller trust store
+      delegate_to: localhost
+      run_once: true
+      become: true
+      block:
+        - name: Check if CA exists in controller trust store
+          stat:
+            path: "{{ step_ca_system_ca_path }}"
+          register: step_ca_controller_ca_stat
+
+        - name: Remove root CA from controller trust store
+          file:
+            path: "{{ step_ca_system_ca_path }}"
+            state: absent
+          when: step_ca_controller_ca_stat.stat.exists
+          register: step_ca_controller_ca_removed
+
+        - name: Update ca certificates on controller
+          command:
+            cmd: update-ca-certificates --fresh
+          when: step_ca_controller_ca_removed.changed
+          changed_when: true

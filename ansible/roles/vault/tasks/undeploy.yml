@@ -1,0 +1,25 @@
+- name: Check if vault compose file exists
+  stat:
+    path: "{{ vault_service_dir }}/docker-compose.yml"
+  register: vault_compose
+
+- name: Stop vault container
+  community.docker.docker_compose_v2:
+    project_src: "{{ vault_service_dir }}"
+    state: absent
+  when:
+    - undeploy_levels[undeploy_level] >= undeploy_levels.stop
+    - vault_compose.stat.exists
+
+- name: Remove vault service directory
+  file:
+    path: "{{ vault_service_dir }}"
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.wipe
+
+- name: Remove hvac library from ansible venv
+  pip:
+    name: hvac
+    state: absent
+    virtualenv: "{{ ansible_venv_path }}"
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.restore

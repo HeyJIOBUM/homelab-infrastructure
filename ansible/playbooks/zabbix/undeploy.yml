@@ -1,0 +1,8 @@
+- name: Undeploy zabbix
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy zabbix
+      include_role:
+        name: zabbix
+        tasks_from: undeploy

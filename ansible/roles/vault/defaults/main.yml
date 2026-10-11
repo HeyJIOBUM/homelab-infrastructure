@@ -41,3 +41,12 @@ vault_init_roles: []
 vault_log_service_name: "not_set"
 vault_service_secrets: []
 vault_service_secrets_path: ""
+
+#---------------------------------------------------------
+# undeploy
+undeploy_level: none
+undeploy_levels:
+  none: 0      # default
+  stop: 1      # stop container
+  wipe: 2      # stop container + wipe service data
+  restore: 3   # stop container + wipe service data + restore the pre-deployment state

@@ -1,0 +1,8 @@
+- name: Undeploy step_ca
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy step_ca
+      include_role:
+        name: step_ca
+        tasks_from: undeploy

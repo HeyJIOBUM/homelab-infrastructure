@@ -1,0 +1,8 @@
+- name: Undeploy dnsweaver
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy dnsweaver
+      include_role:
+        name: dnsweaver
+        tasks_from: undeploy

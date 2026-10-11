@@ -1,0 +1,18 @@
+- name: Check if dnsweaver compose file exists
+  stat:
+    path: "{{ dnsweaver_service_dir }}/docker-compose.yml"
+  register: dnsweaver_compose
+
+- name: Stop dnsweaver container
+  community.docker.docker_compose_v2:
+    project_src: "{{ dnsweaver_service_dir }}"
+    state: absent
+  when:
+    - undeploy_levels[undeploy_level] >= undeploy_levels.stop
+    - dnsweaver_compose.stat.exists
+
+- name: Remove dnsweaver service directory
+  file:
+    path: "{{ dnsweaver_service_dir }}"
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.wipe

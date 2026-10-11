@@ -1,0 +1,8 @@
+- name: Undeploy ittools
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy ittools
+      include_role:
+        name: ittools
+        tasks_from: undeploy

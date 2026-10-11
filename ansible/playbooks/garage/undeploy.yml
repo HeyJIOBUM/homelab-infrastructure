@@ -1,0 +1,8 @@
+- name: Undeploy garage
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy garage
+      include_role:
+        name: garage
+        tasks_from: undeploy

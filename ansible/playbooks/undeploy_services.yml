@@ -1,0 +1,35 @@
+# Undeploy all homelab services
+#
+# Order:
+#   1. zabbix
+#   2. ittools
+#   3. garage
+#   4. traefik
+#   5. dnsweaver
+#   6. technitium
+#   7. vault
+#   8. step_ca
+
+- name: Undeploy zabbix
+  import_playbook: zabbix/undeploy.yml
+
+- name: Undeploy ittools
+  import_playbook: ittools/undeploy.yml
+
+- name: Undeploy garage
+  import_playbook: garage/undeploy.yml
+
+- name: Undeploy traefik
+  import_playbook: traefik/undeploy.yml
+
+- name: Undeploy dnsweaver
+  import_playbook: dnsweaver/undeploy.yml
+
+- name: Undeploy technitium
+  import_playbook: technitium/undeploy.yml
+
+- name: Undeploy vault
+  import_playbook: vault/undeploy.yml
+
+- name: Undeploy step_ca
+  import_playbook: step_ca/undeploy.yml

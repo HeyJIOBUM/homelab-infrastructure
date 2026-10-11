@@ -1,0 +1,8 @@
+- name: Undeploy vault
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy vault
+      include_role:
+        name: vault
+        tasks_from: undeploy

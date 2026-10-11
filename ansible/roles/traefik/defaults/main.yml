@@ -12,3 +12,12 @@ traefik_vault_secrets:
   - ansible_name: traefik_api_password
     vault_name: api_password
     generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
+
+#---------------------------------------------------------
+# undeploy
+undeploy_level: none
+undeploy_levels:
+  none: 0      # default
+  stop: 1      # stop container
+  wipe: 2      # stop container + wipe service data
+  restore: 3   # stop container + wipe service data + restore the pre-deployment state
