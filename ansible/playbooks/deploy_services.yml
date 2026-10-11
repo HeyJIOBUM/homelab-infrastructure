@@ -1,0 +1,39 @@
+# Deploy all homelab services
+#
+# Order:
+#   1. step_ca
+#   2. vault
+#   3. technitium
+#   4. dnsweaver
+#   5. traefik
+#   6. garage
+#   7. ittools
+#   8. zabbix
+
+- name: Deploy step_ca
+  import_playbook: step_ca/deploy.yml
+
+# requires ansible vault unseal for vault_admin_password
+- name: Deploy vault
+  import_playbook: vault/deploy.yml
+
+- name: Init servicies secrets
+  import_playbook: vault/init_services_secrets.yml
+
+- name: Deploy technitium
+  import_playbook: technitium/deploy.yml
+
+- name: Deploy dnsweaver
+  import_playbook: dnsweaver/deploy.yml
+
+- name: Deploy traefik
+  import_playbook: traefik/deploy.yml
+
+- name: Deploy garage
+  import_playbook: garage/deploy.yml
+
+- name: Deploy ittools
+  import_playbook: ittools/deploy.yml
+
+- name: Deploy zabbix
+  import_playbook: zabbix/deploy.yml
