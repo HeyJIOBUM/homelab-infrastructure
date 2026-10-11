@@ -11,14 +11,26 @@
   until: technitium_login.json.status | default('') == "ok"
   retries: 15
   delay: 5
-  failed_when: false
-  no_log: true
   changed_when: false
+  no_log: true
 
-- name: Create api token for dnsweaver if not exist
-  when: >
-    technitium_api_token is not defined or
-    technitium_api_token | length == 0
+- name: Validate api token
+  uri:
+    url: "{{ technitium_addr }}/api/user/session/get"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ technitium_api_token }}"
+  register: technitium_token_check
+  when: technitium_api_token | length > 0
+  changed_when: false
+  no_log: true
+
+- name: Decide if token generation is needed
+  set_fact:
+    technitium_genereate_token: "{{ technitium_api_token | length == 0 or technitium_token_check.json.status == 'invalid-token' }}"
+
+- name: Create api token for dnsweaver if not valid
+  when: technitium_genereate_token == true
   no_log: true
   block:
     - name: Create api token for dnsweaver
