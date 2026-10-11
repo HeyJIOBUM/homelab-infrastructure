@@ -1,4 +1,9 @@
-- name: restart vault container
+- name: Restart vault container
+  listen: "restart vault container"
   community.docker.docker_compose_v2:
     project_src: "{{ vault_service_dir }}"
     state: restarted
+
+- name: Unseal vault after restart
+  listen: "restart vault container"
+  include_tasks: deploy/unseal.yml
