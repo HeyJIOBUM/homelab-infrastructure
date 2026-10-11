@@ -1,0 +1,5 @@
+step_ca_system_ca_path: "/usr/local/share/ca-certificates/homelab-root-ca.crt"
+
+step_ca_api_port: "9000"
+step_ca_ip: "{{ hostvars['vps1'].ansible_host }}"
+step_ca_addr: "https://{{ step_ca_ip }}:{{ step_ca_api_port }}"

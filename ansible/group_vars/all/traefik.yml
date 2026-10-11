@@ -1,0 +1,6 @@
+traefik_docker_network: "traefik"
+traefik_network_subnet: "172.21.0.0/16"
+traefik_network_gateway: "172.21.0.1"
+
+traefik_ip: "{{ hostvars['vps1'].ansible_host }}"
+traefik_addr: "https://{{ traefik_ip }}"
