@@ -26,6 +26,7 @@
     dest: /etc/zabbix/zabbix_agent2.d/plugins.d/postgresql.conf
     mode: "0644"
     content: |
+      Plugins.PostgreSQL.System.Path=/usr/libexec/zabbix/zabbix-agent2-plugin-postgresql
       Plugins.PostgreSQL.Default.Uri=tcp://{{ zabbix_ip }}:{{ zabbix_postgress_port }}
       Plugins.PostgreSQL.Default.User=zbx_monitor
       Plugins.PostgreSQL.Default.Password={{ zabbix_pg_monitor_password }}
