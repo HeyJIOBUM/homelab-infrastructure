@@ -1,3 +1,10 @@
+- name: Add zabbix user to docker group
+  user:
+    name: zabbix
+    groups: docker
+    append: true
+  notify: restart zabbix-agent2
+
 - name: Create or update Zabbix monitoring user in PostgreSQL
   shell: |
     docker exec -i zabbix-postgres psql -U zabbix -d zabbix <<'EOF'
