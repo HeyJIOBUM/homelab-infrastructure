@@ -4,7 +4,11 @@ traefik_config_dir: "{{ traefik_service_dir }}/config"
 traefik_credentials_dir: "{{ traefik_service_dir }}/credentials"
 
 # config
-traefic_tag: "v3.7"
+traefik_tag: "v3.7"
+
+traefik_ca_acme_duration: 720
+
+traefik_bcrypt_salt: "{{ ansible_facts['machine_id'] | hash('sha256') | truncate(22, true, '') }}"
 
 # vault
 traefik_vault_path: infra/traefik
