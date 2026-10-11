@@ -33,13 +33,6 @@
     - { key: "Hostname",     value: "{{ zabbix_default_hostname }}" }
   notify: restart zabbix-agent2
 
-- name: Add zabbix user to docker group
-  user:
-    name: zabbix
-    groups: docker
-    append: true
-  notify: restart zabbix-agent2
-
 - name: Enable and start zabbix-agent2
   systemd:
     name: zabbix-agent2
