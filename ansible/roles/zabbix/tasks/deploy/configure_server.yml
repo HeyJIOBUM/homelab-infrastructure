@@ -146,6 +146,7 @@
       loop: "{{ zabbix_vault_secrets }}"
       loop_control:
         label: "{{ item.vault_name }}"
+      no_log: true
 
     - name: Save zabbix secrets with token to vault
       community.hashi_vault.vault_kv2_write:
@@ -155,6 +156,7 @@
         engine_mount_point: "{{ vault_kv_engine }}"
         path: "{{ zabbix_vault_path }}"
         data: "{{ zabbix_vault_data }}"
+      no_log: true
 
 - name: Get "Zabbix server" host
   uri:

@@ -58,6 +58,7 @@
       loop: "{{ technitium_vault_secrets }}"
       loop_control:
         label: "{{ item.vault_name }}"
+      no_log: true
 
     - name: Save technitium secrets to vault
       community.hashi_vault.vault_kv2_write:
