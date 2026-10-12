@@ -4,11 +4,12 @@
 #   1. zabbix
 #   2. ittools
 #   3. garage
-#   4. traefik
-#   5. dnsweaver
-#   6. technitium
-#   7. vault
-#   8. step_ca
+#   4. homepage
+#   5. traefik
+#   6. dnsweaver
+#   7. technitium
+#   8. vault
+#   9. step_ca
 
 - name: Undeploy zabbix
   import_playbook: zabbix/undeploy.yml
@@ -18,6 +19,9 @@
 
 - name: Undeploy garage
   import_playbook: garage/undeploy.yml
+
+- name: Undeploy homepage
+  import_playbook: homepage/undeploy.yml
 
 - name: Undeploy traefik
   import_playbook: traefik/undeploy.yml

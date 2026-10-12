@@ -1,0 +1,17 @@
+# Dirs
+homepage_service_dir: "{{ services_path }}/homepage"
+homepage_config_dir: "{{ homepage_service_dir }}/config"
+homepage_icons_dir: "{{ homepage_service_dir }}/icons"
+
+# Config
+homepage_tag: "latest"
+homepage_internal_port: 3000
+
+homepage_ip: "{{ hostvars['vps1'].ansible_host }}"
+homepage_addr: "https://homepage.homelab"
+
+# Page settings
+homepage_title: "Homelab"
+homepage_description: "Homelab infrastructure"
+homepage_theme: "dark"
+homepage_color: "slate"

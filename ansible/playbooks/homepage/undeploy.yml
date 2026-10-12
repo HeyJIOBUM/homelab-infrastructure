@@ -1,0 +1,8 @@
+- name: Undeploy homepage
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy homepage
+      include_role:
+        name: homepage
+        tasks_from: undeploy

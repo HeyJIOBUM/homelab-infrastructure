@@ -1,0 +1,4 @@
+- name: restart homepage container
+  community.docker.docker_compose_v2:
+    project_src: "{{ homepage_service_dir }}"
+    state: restarted

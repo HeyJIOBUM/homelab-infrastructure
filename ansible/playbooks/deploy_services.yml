@@ -6,9 +6,10 @@
 #   3. technitium
 #   4. dnsweaver
 #   5. traefik
-#   6. garage
-#   7. ittools
-#   8. zabbix
+#   6. homepage
+#   7. garage
+#   8. ittools
+#   9. zabbix
 
 - name: Deploy step_ca
   import_playbook: step_ca/deploy.yml
@@ -28,6 +29,9 @@
 
 - name: Deploy traefik
   import_playbook: traefik/deploy.yml
+
+- name: Deploy homepage
+  import_playbook: homepage/deploy.yml
 
 - name: Deploy garage
   import_playbook: garage/deploy.yml

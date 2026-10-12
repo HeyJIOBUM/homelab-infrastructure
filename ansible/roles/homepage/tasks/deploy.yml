@@ -1,0 +1,55 @@
+- name: Create homepage directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ homepage_service_dir }}"
+    - "{{ homepage_config_dir }}"
+    - "{{ homepage_icons_dir }}"
+
+- name: Create Homepage settings
+  template:
+    src: config/settings.yml.j2
+    dest: "{{ homepage_config_dir }}/settings.yaml"
+    mode: "0644"
+  notify: restart homepage container
+
+- name: Create Homepage docker config
+  template:
+    src: config/docker.yml.j2
+    dest: "{{ homepage_config_dir }}/docker.yaml"
+    mode: "0644"
+  notify: restart homepage container
+
+- name: Create Homepage bookmarks
+  template:
+    src: config/bookmarks.yml.j2
+    dest: "{{ homepage_config_dir }}/bookmarks.yaml"
+    mode: "0600"
+  notify: restart homepage container
+
+- name: Create Homepage services
+  template:
+    src: config/services.yml.j2
+    dest: "{{ homepage_config_dir }}/services.yaml"
+    mode: "0600"
+  notify: restart homepage container
+
+- name: Create Homepage widgets
+  template:
+    src: config/widgets.yml.j2
+    dest: "{{ homepage_config_dir }}/widgets.yaml"
+    mode: "0644"
+  notify: restart homepage container
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ homepage_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start homepage container
+  community.docker.docker_compose_v2:
+    project_src: "{{ homepage_service_dir }}"
+    state: present

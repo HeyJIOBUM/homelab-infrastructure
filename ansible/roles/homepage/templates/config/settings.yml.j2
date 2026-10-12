@@ -1,0 +1,20 @@
+title: {{ homepage_title }}
+description: {{ homepage_description }}
+theme: {{ homepage_theme }}
+color: {{ homepage_color }}
+
+layout:
+  Infrastructure:
+    style: row
+    columns: 4
+  Applications:
+    style: row
+    columns: 4
+  External:
+    style: row
+    columns: 4
+
+providers:
+  docker:
+    endpoint: my-docker
+    autoDiscover: true
