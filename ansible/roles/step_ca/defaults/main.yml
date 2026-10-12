@@ -39,7 +39,7 @@ step_ca_image_tag: "0.30.2"
 
 # Init
 step_ca_init_name: "Homelab Root CA"
-step_ca_init_dns_names: "step-ca,ca.homelab,localhost,127.0.0.1,{{ step_ca_ip }}"
+step_ca_init_dns_names: "step-ca,ca.{{ technitium_dns_zone }},localhost,127.0.0.1,{{ step_ca_ip }}"
 step_ca_init_jwk_provisioner_name: "admin_jwk"
 step_ca_init_ssh: "false"
 

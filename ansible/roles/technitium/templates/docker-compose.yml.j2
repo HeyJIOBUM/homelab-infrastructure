@@ -7,7 +7,7 @@ services:
       - "53:53/udp"
       - "53:53/tcp"
     environment:
-      - DNS_SERVER_DOMAIN=dns.homelab
+      - DNS_SERVER_DOMAIN=dns.{{ technitium_dns_zone }}
       - DNS_SERVER_ADMIN_PASSWORD_FILE={{ technitium_container_admin_password_file }}
       - DNS_SERVER_LOG_USING_LOCAL_TIME=true
     volumes:
@@ -19,7 +19,7 @@ services:
         ipv4_address: {{ technitium_docker_ip }}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.technitium.rule=Host(`dns.homelab`)"
+      - "traefik.http.routers.technitium.rule=Host(`dns.{{ technitium_dns_zone }}`)"
       - "traefik.http.routers.technitium.entrypoints=websecure"
       - "traefik.http.routers.technitium.tls.certresolver=stepca"
       - "traefik.http.services.technitium.loadbalancer.server.port=5380"

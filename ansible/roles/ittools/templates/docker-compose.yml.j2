@@ -9,7 +9,7 @@ services:
       - {{ traefik_docker_network }}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ittools.rule=Host(`ittools.homelab`)"
+      - "traefik.http.routers.ittools.rule=Host(`ittools.{{ technitium_dns_zone }}`)"
       - "traefik.http.routers.ittools.entrypoints=websecure"
       - "traefik.http.routers.ittools.tls.certresolver=stepca"
       - "traefik.http.services.ittools.loadbalancer.server.port=80"

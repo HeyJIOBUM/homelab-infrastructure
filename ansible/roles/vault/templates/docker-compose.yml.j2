@@ -17,7 +17,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.vault.rule=Host(`vault.homelab`)"
+      - "traefik.http.routers.vault.rule=Host(`vault.{{ technitium_dns_zone }}`)"
       - "traefik.http.routers.vault.entrypoints=websecure"
       - "traefik.http.routers.vault.tls.certresolver=stepca"
       - "traefik.http.services.vault.loadbalancer.server.port={{ vault_port }}"
