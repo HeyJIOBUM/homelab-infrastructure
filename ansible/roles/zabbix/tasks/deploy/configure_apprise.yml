@@ -1,0 +1,177 @@
+- name: Get apprise admin password
+  include_role:
+    name: apprise
+    tasks_from: read_vault_secrets
+
+- name: Try to fetch Apprise media type
+  uri:
+    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: "application/json-rpc"
+      Authorization: "Bearer {{ zabbix_api_token }}"
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "mediatype.get"
+      params:
+        filter:
+          name: "Apprise"
+        output: ["mediatypeid", "name"]
+      id: 99
+  register: zabbix_apprise_check
+  no_log: true
+
+- name: Create Apprise webhook media type if not exist
+  uri:
+    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: "application/json-rpc"
+      Authorization: "Bearer {{ zabbix_api_token }}"
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "mediatype.create"
+      params:
+        name: "Apprise"
+        type: 4
+        status: 0
+        description: "Send alerts to Apprise"
+        parameters:
+          - name: "apprise_url"
+            value: "{{ apprise_addr }}/notify/zabbix_admin"
+          - name: "apprise_user"
+            value: "admin"
+          - name: "apprise_password"
+            value: "{{ apprise_admin_password }}"
+          - name: "subject"
+            value: "{ALERT.SUBJECT}"
+          - name: "message"
+            value: "{ALERT.MESSAGE}"
+        script: |
+          try {
+              var params = JSON.parse(value);
+              var req = new HttpRequest();
+              
+              var auth = btoa(params.apprise_user + ':' + params.apprise_password);
+              
+              var payload = JSON.stringify({
+                  "title": params.subject,
+                  "body": params.message,
+                  "type": "failure"
+              });
+              
+              req.addHeader('Content-Type: application/json');
+              req.addHeader('Authorization: Basic ' + auth);
+              
+              var resp = req.post(params.apprise_url, payload);
+              if (req.getStatus() != 200) {
+                  throw 'Apprise responded with status: ' + req.getStatus();
+              }
+              return 'OK';
+          } catch (error) {
+              Zabbix.log(4, '[Apprise] Notification failed: ' + error);
+              throw error;
+          }
+        message_templates:
+          - eventsource: 0
+            recovery: 0
+            subject: "[Zabbix] {EVENT.NAME}"
+            message: "Host: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\nProblem: {EVENT.OPDATA}"
+          - eventsource: 0
+            recovery: 1
+            subject: "[Zabbix] Resolved: {EVENT.NAME}"
+            message: "Host: {HOST.NAME}\nProblem resolved: {EVENT.NAME}"
+      id: 100
+  when: zabbix_apprise_check.json.result | length == 0
+  register: zabbix_apprise_mediatype
+  no_log: true
+
+- name: Set Apprise media type id
+  set_fact:
+    apprise_media_type_id: >-
+      {{
+        zabbix_apprise_check.json.result[0].mediatypeid
+        if (zabbix_apprise_check.json.result | length > 0)
+        else zabbix_apprise_mediatype.json.result.mediatypeids[0]
+      }}
+
+- name: Get Zabbix Admin user
+  uri:
+    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: "application/json-rpc"
+      Authorization: "Bearer {{ zabbix_api_token }}"
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "user.get"
+      params:
+        filter:
+          username: "Admin"
+        output: ["userid"]
+      id: 101
+  register: zabbix_admin_user
+  no_log: true
+
+- name: Attach Apprise media to Admin user
+  uri:
+    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: "application/json-rpc"
+      Authorization: "Bearer {{ zabbix_api_token }}"
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "user.update"
+      params:
+        userid: "{{ zabbix_admin_user.json.result[0].userid }}"
+        medias:
+          - mediatypeid: "{{ apprise_media_type_id }}"
+            sendto: "apprise"
+            active: 0
+            severity: 63
+            period: "1-7,00:00-24:00"
+      id: 102
+  no_log: true
+
+- name: Create Zabbix action to send alerts via Apprise
+  uri:
+    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    method: POST
+    headers:
+      Content-Type: "application/json-rpc"
+      Authorization: "Bearer {{ zabbix_api_token }}"
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "action.create"
+      params:
+        name: "Send alerts via Apprise"
+        eventsource: 0          # 0 = Trigger events
+        status: 0
+        esc_period: "1h"
+        filter:
+          evaltype: 0
+          conditions: []
+        operations:
+          - operationtype: 0    # 0 = Send message
+            esc_step_from: 1
+            esc_step_to: 1
+            opmessage:
+              default_msg: 1
+              mediatypeid: "{{ apprise_media_type_id }}"
+            opmessage_usr:
+              - userid: "{{ zabbix_admin_user.json.result[0].userid }}"
+        recovery_operations:
+          - operationtype: 0    # 0 = Send message (recovery)
+            opmessage:
+              default_msg: 1
+              mediatypeid: "{{ apprise_media_type_id }}"
+            opmessage_usr:
+              - userid: "{{ zabbix_admin_user.json.result[0].userid }}"
+      id: 200
+  no_log: true

@@ -39,3 +39,10 @@
     apply:
       tags: zabbix-server
   tags: zabbix-server
+
+- name: Configure apprise notifications on zabbix server
+  include_tasks: 
+    file: deploy/configure_apprise.yml
+    apply:
+      tags: zabbix-apprise
+  tags: zabbix-apprise
