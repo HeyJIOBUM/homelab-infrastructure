@@ -1,0 +1,87 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags: always
+
+- name: Get syncthing secrets
+  include_role:
+    name: syncthing
+    tasks_from: read_vault_secrets
+  tags: always
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ syncthing_service_dir }}"
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ syncthing_user }}"
+    group: "{{ syncthing_group }}"
+  loop:
+    - "{{ syncthing_config_dir }}"
+    - "{{ syncthing_data_dir }}"
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ syncthing_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start syncthing container
+  community.docker.docker_compose_v2:
+    project_src: "{{ syncthing_service_dir }}"
+    state: present
+
+- name: Set gui user and password
+  uri:
+    url: "http://127.0.0.1:{{ syncthing_gui_port }}/rest/config/gui"
+    method: PATCH
+    headers:
+      X-API-Key: "{{ syncthing_api_key }}"
+    body_format: json
+    body:
+      user: "admin"
+      password: "{{ syncthing_admin_password }}"
+    status_code: 200
+  no_log: true
+
+- name: Add keepass folders
+  shell: >- 
+    docker exec syncthing syncthing cli 
+    --gui-address=127.0.0.1:{{ syncthing_gui_port }} --gui-apikey={{ syncthing_api_key }} 
+    config folders add --id {{ folder.id }} --label {{ folder.label }} --path {{ folder.path }}
+  loop: "{{ syncthing_default_folders }}"
+  loop_control:
+    label: "{{ folder.label }}"
+    loop_var: folder
+  register: syncthing_add_folder
+  failed_when:
+    - syncthing_add_folder.rc != 0
+    - "'duplicate ID' not in syncthing_add_folder.stderr"
+  changed_when: "'duplicate ID' not in syncthing_add_folder.stderr"
+  no_log: true
+
+- name: Configure syncthing options
+  uri:
+    url: "http://127.0.0.1:{{ syncthing_gui_port }}/rest/config/options"
+    method: PATCH
+    headers:
+      X-API-Key: "{{ syncthing_api_key }}"
+    body_format: json
+    body:
+      globalAnnounceEnabled: false
+      relaysEnabled: false
+      natEnabled: false
+      crashReportingEnabled: false
+      autoUpgradeIntervalH: 0
+      urAccepted: -1
+    status_code: 200
+  no_log: true

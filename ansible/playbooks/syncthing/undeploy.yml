@@ -1,0 +1,8 @@
+- name: Undeploy syncthing
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy syncthing
+      include_role:
+        name: syncthing
+        tasks_from: undeploy

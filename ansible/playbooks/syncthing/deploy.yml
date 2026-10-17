@@ -1,0 +1,8 @@
+- name: Deploy syncthing
+  hosts: all
+  become: yes
+  tasks:
+    - name: Deploy syncthing
+      include_role:
+        name: syncthing
+        tasks_from: deploy

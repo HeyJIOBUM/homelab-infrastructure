@@ -1,0 +1,38 @@
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:{{ syncthing_tag }}
+    container_name: syncthing
+    restart: unless-stopped
+
+    environment:
+      - PUID={{ syncthing_user }}
+      - PGID={{ syncthing_group }}
+      - STGUIAPIKEY={{ syncthing_api_key }}
+
+    ports:
+      - "{{ syncthing_gui_port }}:8384"
+      - "{{ syncthing_sync_port }}:22000"
+      - "{{ syncthing_discovery_port }}:21027"
+    networks:
+      - {{ traefik_docker_network }}
+    
+    volumes:
+      - "{{ syncthing_data_dir }}:/data"
+      - "{{ syncthing_config_dir }}:/config"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncthing.rule=Host(`syncthing.{{ technitium_dns_zone }}`)"
+      - "traefik.http.routers.syncthing.entrypoints=websecure"
+      - "traefik.http.routers.syncthing.tls.certresolver=stepca"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=syncthing"
+      - "homepage.description=Syncthing"
+      - "homepage.icon=syncthing.png"
+      - "homepage.href=https://syncthing.{{ technitium_dns_zone }}"
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true

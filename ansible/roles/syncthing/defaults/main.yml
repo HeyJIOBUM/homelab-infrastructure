@@ -1,0 +1,29 @@
+# Dirs
+syncthing_service_dir: "{{ services_path }}/syncthing"
+syncthing_data_dir: "{{ syncthing_service_dir }}/data"
+syncthing_config_dir: "{{ syncthing_service_dir }}/config"
+
+# config
+syncthing_tag: "2.1.6"
+
+syncthing_user: "1000"
+syncthing_group: "1000"
+
+syncthing_gui_port: "8384"
+syncthing_sync_port: "22000"
+syncthing_discovery_port: "21027"
+
+syncthing_default_folders:
+  - id: "keepass"
+    label: "keepass"
+    path: "/data/keepass"
+
+# vault
+syncthing_vault_path: infra/syncthing
+syncthing_vault_secrets:
+  - ansible_name: syncthing_api_key
+    vault_name: api_key
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
+  - ansible_name: syncthing_admin_password
+    vault_name: admin_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
