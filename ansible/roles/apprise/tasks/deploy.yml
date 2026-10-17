@@ -41,13 +41,19 @@
     project_src: "{{ apprise_service_dir }}"
     state: present
 
-- name: Configure Apprise notification URLs
+- name: Add apprise configurations
   uri:
-    url: "{{ apprise_addr }}/add/{{ apprise_config_key }}"
+    url: "{{ apprise_addr }}/add/{{ apprise_config.config_id }}"
     method: POST
-    body_format: form
+    url_username: "admin"
+    url_password: "{{ apprise_admin_password }}"
+    force_basic_auth: true
+    body_format: json
     body:
-      urls: "{{ apprise_urls | join(',') }}"
+      urls: "{{ apprise_config.urls | join(',') | default(apprise_default_url, true) }}"
     status_code: 200
   no_log: true
-  when: apprise_urls | length > 0
+  loop: "{{ apprise_default_configurations }}"
+  loop_control:
+    loop_var: apprise_config
+    label: "{{ apprise_config.config_id }}"

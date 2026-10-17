@@ -11,8 +11,10 @@ apprise_user: "1000"
 apprise_group: "1000"
 
 # Notify
-apprise_config_key: "homelab"
-apprise_urls: []
+apprise_default_url: "json://localhost/ignore"
+apprise_default_configurations:
+  - config_id: "zabbix_admin"
+    urls: []
 
 # vault
 apprise_vault_path: infra/apprise
