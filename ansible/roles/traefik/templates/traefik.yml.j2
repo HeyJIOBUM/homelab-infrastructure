@@ -27,8 +27,7 @@ certificatesResolvers:
   stepca:
     acme:
       certificatesDuration: {{ traefik_ca_acme_duration }}
-      httpChallenge:
-        entryPoint: web
+      tlsChallenge: {}
       email: "kirill.nichinger@gmail.com"
       storage: "/etc/traefik/acme.json"
       caServer: "{{ step_ca_addr }}/acme/acme/directory"
