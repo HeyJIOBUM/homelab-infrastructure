@@ -7,9 +7,6 @@ homepage_icons_dir: "{{ homepage_service_dir }}/icons"
 homepage_tag: "latest"
 homepage_internal_port: 3000
 
-homepage_ip: "{{ hostvars['vps1'].ansible_host }}"
-homepage_addr: "https://homepage.homelab"
-
 # Page settings
 homepage_title: "Homelab"
 homepage_description: "Homelab infrastructure"

@@ -4,7 +4,7 @@ services:
     container_name: homepage
     restart: unless-stopped
     environment:
-      - HOMEPAGE_ALLOWED_HOSTS=homepage.homelab
+      - HOMEPAGE_ALLOWED_HOSTS=homepage.{{ technitium_dns_zone }}
     volumes:
       - {{ homepage_config_dir }}:/app/config
       - {{ homepage_icons_dir }}:/app/public/icons
@@ -13,14 +13,14 @@ services:
       - {{ traefik_docker_network }}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.homepage.rule=Host(`homepage.homelab`)"
+      - "traefik.http.routers.homepage.rule=Host(`homepage.{{ technitium_dns_zone }}`)"
       - "traefik.http.routers.homepage.entrypoints=websecure"
       - "traefik.http.routers.homepage.tls.certresolver=stepca"
       - "traefik.http.services.homepage.loadbalancer.server.port={{ homepage_internal_port }}"
       - "homepage.group=Infrastructure"
       - "homepage.name=Homepage"
       - "homepage.icon=homepage.png"
-      - "homepage.href={{ homepage_addr }}"
+      - "homepage.href=https://homepage.{{ technitium_dns_zone }}"
       - "homepage.description=Dashboard"
 
 networks:
