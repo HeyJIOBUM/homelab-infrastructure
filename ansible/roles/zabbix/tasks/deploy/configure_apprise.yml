@@ -77,12 +77,25 @@
         message_templates:
           - eventsource: 0
             recovery: 0
-            subject: "[Zabbix] {EVENT.NAME}"
-            message: "Host: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\nProblem: {EVENT.OPDATA}"
+            subject: "🔴 [{EVENT.SEVERITY}] {HOST.NAME}: {EVENT.NAME}"
+            message: |
+              {EVENT.NAME}
+
+              Host: {HOST.NAME}
+              Severity: {EVENT.SEVERITY}
+              Details: {EVENT.OPDATA}
+              
+              Event ID: {EVENT.ID}
           - eventsource: 0
             recovery: 1
-            subject: "[Zabbix] Resolved: {EVENT.NAME}"
-            message: "Host: {HOST.NAME}\nProblem resolved: {EVENT.NAME}"
+            subject: "🟢 [RESOLVED] {HOST.NAME}: {EVENT.NAME}"
+            message: |
+              Resolved: {EVENT.NAME}
+              
+              Host: {HOST.NAME}
+              Duration: {EVENT.DURATION}
+
+              Event ID: {EVENT.ID}
       id: 100
   when: zabbix_apprise_check.json.result | length == 0
   register: zabbix_apprise_mediatype
