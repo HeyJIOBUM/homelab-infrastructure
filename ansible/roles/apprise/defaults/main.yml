@@ -1,0 +1,23 @@
+# Dirs
+apprise_service_dir: "{{ services_path }}/apprise"
+apprise_config_dir: "{{ apprise_service_dir }}/config"
+apprise_attach_dir: "{{ apprise_service_dir }}/attach"
+apprise_plugin_dir: "{{ apprise_service_dir }}/plugin"
+
+# config
+apprise_tag: "2.0.1"
+apprise_port: "8000"
+
+apprise_user: "1000"
+apprise_group: "1000"
+
+# Notify
+apprise_config_key: "homelab"
+apprise_urls: []
+
+# vault
+apprise_vault_path: infra/apprise
+apprise_vault_secrets:
+  - ansible_name: apprise_admin_password
+    vault_name: admin_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"

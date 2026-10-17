@@ -1,0 +1,44 @@
+services:
+  apprise:
+    image: caronc/apprise:{{ apprise_tag }}
+    container_name: apprise
+    restart: unless-stopped
+
+    user: "1000:1000"
+
+    environment:
+      - TZ={{ timezone }}
+      - APPRISE_STATEFUL_MODE=simple
+      - APPRISE_WORKER_COUNT=1
+      - APPRISE_DEFAULT_FORMAT=text
+      - APPRISE_AUTH_REQUIRED=yes
+      - APPRISE_USER=admin
+      - APPRISE_PASSWORD={{ apprise_admin_password }}
+
+    ports:
+      - "{{ apprise_port }}:8000"
+
+    volumes:
+      - {{ apprise_config_dir }}:/config
+      - {{ apprise_attach_dir }}:/attach
+      - {{ apprise_plugin_dir }}:/plugin
+
+    networks:
+      - {{ traefik_docker_network }}
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apprise.rule=Host(`apprise.{{ technitium_dns_zone }}`)"
+      - "traefik.http.routers.apprise.entrypoints=websecure"
+      - "traefik.http.routers.apprise.tls.certresolver=stepca"
+      - "traefik.http.services.apprise.loadbalancer.server.port=8000"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=Apprise"
+      - "homepage.description=Apprise"
+      - "homepage.icon=apprise.png"
+      - "homepage.href=https://apprise.{{ technitium_dns_zone }}"
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true

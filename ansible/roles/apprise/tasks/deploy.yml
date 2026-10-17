@@ -1,0 +1,53 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags: always
+
+- name: Get apprise secrets
+  include_role:
+    name: apprise
+    tasks_from: read_vault_secrets
+  tags: always
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ apprise_service_dir }}"
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ apprise_user }}"
+    group: "{{ apprise_group }}"
+    mode: "0755"
+  loop:
+    - "{{ apprise_config_dir }}"
+    - "{{ apprise_attach_dir }}"
+    - "{{ apprise_plugin_dir }}"
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ apprise_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start apprise container
+  community.docker.docker_compose_v2:
+    project_src: "{{ apprise_service_dir }}"
+    state: present
+
+- name: Configure Apprise notification URLs
+  uri:
+    url: "http://127.0.0.1:{{ apprise_port }}/add/{{ apprise_config_key }}"
+    method: POST
+    body_format: form
+    body:
+      urls: "{{ apprise_urls | join(',') }}"
+    status_code: 200
+  no_log: true
+  when: apprise_urls | length > 0

@@ -1,0 +1,8 @@
+- name: Undeploy apprise
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy apprise
+      include_role:
+        name: apprise
+        tasks_from: undeploy
