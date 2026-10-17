@@ -9,9 +9,6 @@ zabbix_token_file: "{{ zabbix_credentials_dir }}/zabbix_api_token"
 zabbix_version: "7.4"
 zabbix_image_tag: "{{ zabbix_version }}-latest"
 
-# Timezone
-zabbix_timezone: "Europe/Minsk"
-
 # Config
 zabbix_default_hostname: "vps1"
 
