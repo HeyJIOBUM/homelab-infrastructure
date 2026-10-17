@@ -43,7 +43,7 @@
 
 - name: Configure Apprise notification URLs
   uri:
-    url: "http://127.0.0.1:{{ apprise_port }}/add/{{ apprise_config_key }}"
+    url: "{{ apprise_addr }}/add/{{ apprise_config_key }}"
     method: POST
     body_format: form
     body:

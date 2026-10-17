@@ -9,8 +9,9 @@
 #   6. homepage
 #   7. garage
 #   8. ittools
-#   9. zabbix
-#   10. syncthing
+#   9. apprise
+#   10. zabbix
+#   11. syncthing
 
 - name: Deploy step_ca
   import_playbook: step_ca/deploy.yml
@@ -39,6 +40,9 @@
 
 - name: Deploy ittools
   import_playbook: ittools/deploy.yml
+
+- name: Deploy apprise
+  import_playbook: apprise/deploy.yml
 
 - name: Deploy zabbix
   import_playbook: zabbix/deploy.yml

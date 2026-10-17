@@ -3,20 +3,24 @@
 # Order:
 #   1. syncthing
 #   2. zabbix
-#   3. ittools
-#   4. garage
-#   5. homepage
-#   6. traefik
-#   7. dnsweaver
-#   8. technitium
-#   9. vault
-#   10. step_ca
+#   3. apprise
+#   4. ittools
+#   5. garage
+#   6. homepage
+#   7. traefik
+#   8. dnsweaver
+#   9. technitium
+#   10. vault
+#   11. step_ca
 
 - name: Undeploy syncthing
   import_playbook: syncthing/undeploy.yml
 
 - name: Undeploy zabbix
   import_playbook: zabbix/undeploy.yml
+
+- name: Undeploy apprise
+  import_playbook: apprise/undeploy.yml
 
 - name: Undeploy ittools
   import_playbook: ittools/undeploy.yml
