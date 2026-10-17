@@ -2,10 +2,22 @@ services:
   traefik:
     image: traefik:{{ traefik_tag }}
     container_name: traefik
+    restart: unless-stopped
+
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ traefik_config_dir }}:/etc/traefik
+      - {{ traefik_config_dir }}/traefik.yml:/etc/traefik/traefik.yml:ro
+      - {{ step_ca_system_ca_path }}:/etc/traefik/step_ca_root.crt:ro
+
+    networks:
+      - {{ traefik_docker_network }}
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.{{ technitium_dns_zone }}`)"
@@ -14,14 +26,12 @@ services:
       - "traefik.http.routers.dashboard.tls.certresolver=stepca"
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:{{ traefik_admin_password | password_hash('bcrypt', salt=traefik_bcrypt_salt) | replace('$', '$$') }}"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - {{ traefik_config_dir }}:/etc/traefik
-      - {{ traefik_config_dir }}/traefik.yml:/etc/traefik/traefik.yml:ro
-      - {{ step_ca_system_ca_path }}:/etc/traefik/step_ca_root.crt:ro
-    networks:
-      - {{ traefik_docker_network }}
-    restart: unless-stopped
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=Traefik"
+      - "homepage.description=Traefik"
+      - "homepage.icon=traefik.png"
+      - "homepage.href=https://traefik.{{ technitium_dns_zone }}"
 
 networks:
   {{ traefik_docker_network }}:

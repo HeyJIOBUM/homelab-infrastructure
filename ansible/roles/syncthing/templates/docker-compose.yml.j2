@@ -13,12 +13,13 @@ services:
       - "{{ syncthing_gui_port }}:8384"
       - "{{ syncthing_sync_port }}:22000"
       - "{{ syncthing_discovery_port }}:21027"
-    networks:
-      - {{ traefik_docker_network }}
-    
+
     volumes:
       - "{{ syncthing_data_dir }}:/data"
       - "{{ syncthing_config_dir }}:/config"
+
+    networks:
+      - {{ traefik_docker_network }}
 
     labels:
       - "traefik.enable=true"

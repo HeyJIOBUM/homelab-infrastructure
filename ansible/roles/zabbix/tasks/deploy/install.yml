@@ -8,13 +8,6 @@
     - "{{ zabbix_data_dir }}"
     - "{{ zabbix_credentials_dir }}"
 
-- name: Write zabbix db password file
-  copy:
-    content: "POSTGRES_PASSWORD={{ zabbix_db_password }}"
-    dest: "{{ zabbix_service_dir }}/zabbix.env"
-    mode: "0600"
-  no_log: true
-
 - name: Create Docker Compose
   template:
     src: docker-compose.yml.j2

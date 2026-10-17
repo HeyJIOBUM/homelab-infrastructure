@@ -1,18 +1,27 @@
 services:
   ittools:
-    container_name: ittools
     image: corentinth/it-tools:{{ ittools_tag }}
+    container_name: ittools
+    restart: unless-stopped
+
     ports:
       - "{{ ittools_port }}:80"
-    restart: unless-stopped
+
     networks:
       - {{ traefik_docker_network }}
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ittools.rule=Host(`ittools.{{ technitium_dns_zone }}`)"
       - "traefik.http.routers.ittools.entrypoints=websecure"
       - "traefik.http.routers.ittools.tls.certresolver=stepca"
       - "traefik.http.services.ittools.loadbalancer.server.port=80"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=Ittools"
+      - "homepage.description=Ittools"
+      - "homepage.icon=it-tools.png"
+      - "homepage.href=https://ittools.{{ technitium_dns_zone }}"
 
 networks:
   {{ traefik_docker_network }}:

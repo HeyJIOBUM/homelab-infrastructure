@@ -3,19 +3,24 @@ services:
     image: "postgres:16-alpine"
     container_name: zabbix-postgres
     restart: unless-stopped
-    ports:
-      - "{{ zabbix_postgress_port }}:5432"
+
     environment:
       POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: "{{ zabbix_db_password }}"
       POSTGRES_DB: zabbix
-    env_file:
-      - ./zabbix.env
+
+    ports:
+      - "{{ zabbix_postgress_port }}:5432"
+
     volumes:
       - "{{ zabbix_data_dir }}/postgres:/var/lib/postgresql/data"
+
     networks:
       - {{ traefik_docker_network }}
+
     dns:
       - "{{ technitium_docker_ip }}"
+
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U zabbix -d zabbix"]
       interval: 10s
@@ -26,21 +31,25 @@ services:
     image: "zabbix/zabbix-server-pgsql:alpine-{{ zabbix_image_tag }}"
     container_name: zabbix-server
     restart: unless-stopped
+
     depends_on:
       postgres:
         condition: service_healthy
+
     environment:
       DB_SERVER_HOST: postgres
       POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: "{{ zabbix_db_password }}"
       POSTGRES_DB: zabbix
       ZBX_CACHESIZE: 64M
       ZBX_HISTORYCACHESIZE: 32M
-    env_file:
-      - ./zabbix.env
+
     networks:
       - {{ traefik_docker_network }}
+
     dns:
       - "{{ technitium_docker_ip }}"
+
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 10051 || exit 1"]
       interval: 10s
@@ -52,29 +61,40 @@ services:
     image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ zabbix_image_tag }}"
     container_name: zabbix-web
     restart: unless-stopped
-    ports:
-      - "{{ zabbix_web_port }}:8080"
+
     depends_on:
       zabbix-server:
         condition: service_healthy
+
     environment:
       ZBX_SERVER_HOST: zabbix-server
       DB_SERVER_HOST: postgres
       POSTGRES_USER: zabbix
       POSTGRES_DB: zabbix
       PHP_TZ: "{{ zabbix_timezone }}"
-    env_file:
-      - ./zabbix.env
+      POSTGRES_PASSWORD: "{{ zabbix_db_password }}"
+
+    ports:
+      - "{{ zabbix_web_port }}:8080"
+
     networks:
       - {{ traefik_docker_network }}
+
     dns:
       - "{{ technitium_docker_ip }}"
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.zabbix.rule=Host(`zabbix.{{ technitium_dns_zone }}`)"
       - "traefik.http.routers.zabbix.entrypoints=websecure"
       - "traefik.http.routers.zabbix.tls.certresolver=stepca"
       - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=Zabbix"
+      - "homepage.description=Zabbix"
+      - "homepage.icon=zabbix.png"
+      - "homepage.href=https://zabbix.{{ technitium_dns_zone }}"
 
 networks:
   {{ traefik_docker_network }}:

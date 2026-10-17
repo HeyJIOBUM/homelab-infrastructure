@@ -44,17 +44,18 @@ services:
     image: "noooste/garage-ui:{{ garage_ui_image_tag }}"
     container_name: garage-ui
     restart: unless-stopped
+
     depends_on:
       - garage
+
+    environment:
+      GARAGE_UI_GARAGE_ADMIN_TOKEN: "{{ garage_admin_token }}"
 
     ports:
       - "{{ garage_ui_port }}:{{ garage_ui_internal_port }}"
 
     volumes:
       - "{{ garage_config_dir }}/config.yaml:/app/config.yaml:ro"
-
-    environment:
-      GARAGE_UI_GARAGE_ADMIN_TOKEN: "{{ garage_admin_token }}"
 
     networks:
       - {{ traefik_docker_network }}
@@ -65,6 +66,12 @@ services:
       - "traefik.http.routers.garage-ui.entrypoints=websecure"
       - "traefik.http.routers.garage-ui.tls.certresolver=stepca"
       - "traefik.http.services.garage-ui.loadbalancer.server.port={{ garage_ui_internal_port }}"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=Garage"
+      - "homepage.description=Garage"
+      - "homepage.icon=garage.png"
+      - "homepage.href=https://garage-ui.{{ technitium_dns_zone }}"
 
 networks:
   {{ traefik_docker_network }}:

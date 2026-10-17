@@ -2,22 +2,27 @@ services:
   step-ca:
     image: smallstep/step-ca:{{ step_ca_image_tag }}
     container_name: step-ca
+    restart: unless-stopped
+
     environment:
       - DOCKER_STEPCA_INIT_NAME={{ step_ca_init_name }}
       - DOCKER_STEPCA_INIT_DNS_NAMES={{ step_ca_init_dns_names }}
       - DOCKER_STEPCA_INIT_PROVISIONER_NAME={{ step_ca_init_jwk_provisioner_name }}
       - DOCKER_STEPCA_INIT_PASSWORD_FILE={{ step_ca_init_password_container_file }}
       - DOCKER_STEPCA_INIT_SSH={{ step_ca_init_ssh }}
+
     ports:
       - "{{ step_ca_api_port }}:9000"
+
     volumes:
       - "{{ step_ca_data_dir }}:/home/step"
       - "{{ step_ca_init_password_file }}:{{ step_ca_init_password_container_file }}:ro"
+
     networks:
       - {{ traefik_docker_network }}
+
     dns:
       - {{ technitium_docker_ip }}
-    restart: unless-stopped
 
 networks:
   {{ traefik_docker_network }}:

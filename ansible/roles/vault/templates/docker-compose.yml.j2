@@ -15,6 +15,14 @@ services:
     ports:
       - "{{ vault_port }}:{{ vault_port }}"
 
+    volumes:
+      - {{ vault_config_dir }}:/vault/config:ro
+      - {{ vault_data_dir }}:/vault/data
+      - {{ vault_tls_dir }}:/vault/tls:ro
+
+    networks:
+      - {{ traefik_docker_network }}
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.vault.rule=Host(`vault.{{ technitium_dns_zone }}`)"
@@ -24,13 +32,11 @@ services:
       - "traefik.http.services.vault.loadbalancer.server.scheme={{ vault_proto }}"
       - "traefik.http.services.vault.loadBalancer.serversTransport=stepca@file"
 
-    volumes:
-      - {{ vault_config_dir }}:/vault/config:ro
-      - {{ vault_data_dir }}:/vault/data
-      - {{ vault_tls_dir }}:/vault/tls:ro
-
-    networks:
-      - {{ traefik_docker_network }}
+      - "homepage.group=Infrastructure"
+      - "homepage.name=Vault"
+      - "homepage.description=Vault"
+      - "homepage.icon=vault.png"
+      - "homepage.href=https://vault.{{ technitium_dns_zone }}"
 
     command: server
 
