@@ -64,6 +64,7 @@
         ipam_config:
           - subnet: "{{ traefik_network_subnet }}"
             gateway: "{{ traefik_network_gateway }}"
+            iprange: "{{ traefik_network_ip_range }}"
         state: present
 
     - name: Ensure Docker service is enabled and started
