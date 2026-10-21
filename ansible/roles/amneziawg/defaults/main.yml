@@ -1,0 +1,6 @@
+# config
+awg_version: "v6.0.1"
+awg_installer_url: "https://github.com/bivlked/amneziawg-installer/releases/download/{{ awg_version }}/install_amneziawg.sh"
+
+awg_port: "443"
+awg_protocol: "3.1"

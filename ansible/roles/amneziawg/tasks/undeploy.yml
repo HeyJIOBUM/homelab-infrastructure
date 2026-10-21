@@ -1,0 +1,9 @@
+- name: Download amneziawg installer script
+  get_url:
+    url: "{{ awg_installer_url }}"
+    dest: /tmp/install_awg.sh
+    mode: '0755'
+    force: true
+
+- name: Run uninstall
+  shell: bash /tmp/install_awg.sh --uninstall --yes

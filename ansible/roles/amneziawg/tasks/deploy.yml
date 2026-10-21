@@ -1,0 +1,36 @@
+- name: Run install command, first reboot
+  include_tasks:
+    file: deploy_step.yml
+
+- name: Run install command, second reboot
+  include_tasks:
+    file: deploy_step.yml
+
+- name: Run install command, last step
+  include_tasks:
+    file: deploy_step.yml
+
+- name: Final health check
+  command: bash /root/awg/manage_amneziawg.sh check --json
+  register: final_check
+  failed_when: final_check.rc != 0
+  changed_when: false
+
+- name: Ensure service is active and enabled
+  systemd:
+    name: awg-quick@awg0
+    state: started
+    enabled: true
+
+- name: Configure dns for new clients
+  lineinfile:
+    path: /root/awg/awgsetup_cfg.init
+    regexp: "^export CLIENT_DNS="
+    line: "export CLIENT_DNS={{ technitium_ip }}"
+  register: dns_configure
+
+- name: Update dns for existing clients
+  shell: |
+    bash /root/awg/manage_amneziawg.sh modify my_laptop DNS "{{ technitium_ip }}"
+    bash /root/awg/manage_amneziawg.sh modify my_phone DNS "{{ technitium_ip }}"
+  when: dns_configure.changed

@@ -1,0 +1,8 @@
+- name: Undeploy amneziawg
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy amneziawg
+      include_role:
+        name: amneziawg
+        tasks_from: undeploy

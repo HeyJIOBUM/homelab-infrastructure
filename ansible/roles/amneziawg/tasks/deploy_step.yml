@@ -1,0 +1,44 @@
+- name: Check if management script exists
+  stat:
+    path: /root/awg/manage_amneziawg.sh
+  register: manage_script
+
+- name: Run health check
+  command: bash /root/awg/manage_amneziawg.sh check --json
+  register: awg_check
+  failed_when: false
+  changed_when: false
+  when: manage_script.stat.exists
+
+- name: Decide if installation run is needed
+  set_fact:
+    rerun_required: "{{ not manage_script.stat.exists or awg_check.rc != 0 }}"
+
+- name: Download amneziawg installer script if rerun reqiured
+  get_url:
+    url: "{{ awg_installer_url }}"
+    dest: /tmp/install_awg.sh
+    mode: '0755'
+  when: rerun_required
+
+- name: Re-run installer if not complete
+  shell: |
+    bash /tmp/install_awg.sh \
+      --yes \
+      --no-tweaks \
+      --protocol={{ awg_protocol }} \
+      --port={{ awg_port }} \
+      --subnet={{ awg_subnet }} \
+      --disallow-ipv6 \
+      --route-all
+  when: rerun_required
+  register: rerun_result
+  ignore_errors: true
+  ignore_unreachable: true
+
+- name: Wait for host after possible reboot
+  wait_for_connection:
+    delay: 20
+    timeout: 600
+    sleep: 5
+  when: rerun_result is defined and (rerun_result is failed or rerun_result is unreachable)
