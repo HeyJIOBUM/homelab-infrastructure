@@ -94,7 +94,7 @@
     body_format: form-urlencoded
     body:
       recursion: "UseSpecifiedNetworkACL"
-      recursionNetworkACL: "127.0.0.1,{{ traefik_network_subnet }}"
+      recursionNetworkACL: "127.0.0.1,{{ traefik_network_subnet }},{{ awg_subnet }}"
   register: technitium_dns_response
   failed_when:
     - technitium_dns_response.json.status != 'ok'
