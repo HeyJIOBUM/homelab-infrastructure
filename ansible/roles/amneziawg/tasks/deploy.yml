@@ -22,15 +22,25 @@
     state: started
     enabled: true
 
+- name: Read server tunnel IP from installer config
+  shell: |
+    grep '^export AWG_TUNNEL_SUBNET=' /root/awg/awgsetup_cfg.init | cut -d"'" -f2 | cut -d'/' -f1
+  register: awg_server_ip_raw
+  changed_when: false
+
+- name: Set server tunnel IP fact
+  set_fact:
+    awg_server_ip: "{{ awg_server_ip_raw.stdout | trim }}"
+
 - name: Configure dns for new clients
   lineinfile:
     path: /root/awg/awgsetup_cfg.init
     regexp: "^export CLIENT_DNS="
-    line: "export CLIENT_DNS={{ technitium_ip }}"
+    line: "export CLIENT_DNS={{ awg_server_ip }}"
   register: dns_configure
 
 - name: Update dns for existing clients
   shell: |
-    bash /root/awg/manage_amneziawg.sh modify my_laptop DNS "{{ technitium_ip }}"
-    bash /root/awg/manage_amneziawg.sh modify my_phone DNS "{{ technitium_ip }}"
+    bash /root/awg/manage_amneziawg.sh modify my_laptop DNS "{{ awg_server_ip }}"
+    bash /root/awg/manage_amneziawg.sh modify my_phone DNS "{{ awg_server_ip }}"
   when: dns_configure.changed
