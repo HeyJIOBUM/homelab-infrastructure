@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: zabbix
 
     ports:
-      - "{{ zabbix_postgress_port }}:5432"
+      - "127.0.0.1:{{ zabbix_postgress_port }}:5432"
 
     volumes:
       - "{{ zabbix_data_dir }}/postgres:/var/lib/postgresql/data"
