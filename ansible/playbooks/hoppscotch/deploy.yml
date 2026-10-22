@@ -1,0 +1,8 @@
+- name: Deploy hoppscotch
+  hosts: all
+  become: yes
+  tasks:
+    - name: Deploy hoppscotch
+      include_role:
+        name: hoppscotch
+        tasks_from: deploy

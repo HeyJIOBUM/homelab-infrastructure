@@ -1,0 +1,16 @@
+# Dirs
+hoppscotch_service_dir: "{{ services_path }}/hoppscotch"
+hoppscotch_data_dir: "{{ hoppscotch_service_dir }}/data"
+
+# config
+hoppscotch_tag: "2026.9.0"
+
+# Vault
+hoppscotch_vault_path: infra/hoppscotch
+hoppscotch_vault_secrets:
+  - ansible_name: hoppscotch_db_password
+    vault_name: db_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 16') }}"
+  - ansible_name: hoppscotch_data_encryption_key
+    vault_name: data_encryption_key
+    generator: "{{ lookup('pipe', 'openssl rand -hex 16') }}"
