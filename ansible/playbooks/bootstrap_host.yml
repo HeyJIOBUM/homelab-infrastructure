@@ -46,18 +46,6 @@
         state: present
         virtualenv: "{{ ansible_venv_path }}"
 
-    - name: Configure Docker daemon
-      copy:
-        dest: /etc/docker/daemon.json
-        content: |
-          {
-            "userland-proxy": true
-          }
-        owner: root
-        group: root
-        mode: "0644"
-      notify: Restart docker
-
     - name: Create basic docker network
       community.docker.docker_network:
         name: "{{ traefik_docker_network }}"
@@ -72,9 +60,3 @@
         name: docker
         state: started
         enabled: true
-
-  handlers:
-    - name: Restart docker
-      service:
-        name: docker
-        state: restarted

@@ -1,17 +1,21 @@
 # Undeploy all homelab services
 #
 # Order:
-#   1. syncthing
-#   2. zabbix
-#   3. apprise
-#   4. ittools
-#   5. garage
-#   6. homepage
-#   7. traefik
-#   8. dnsweaver
-#   9. technitium
-#   10. vault
-#   11. step_ca
+#   1. amneziawg
+#   2. syncthing
+#   3. zabbix
+#   4. apprise
+#   5. ittools
+#   6. garage
+#   7. homepage
+#   8. traefik
+#   9. dnsweaver
+#   10. technitium
+#   11. vault
+#   12. step_ca
+
+- name: Undeploy amneziawg
+  import_playbook: amneziawg/undeploy.yml
 
 - name: Undeploy syncthing
   import_playbook: syncthing/undeploy.yml

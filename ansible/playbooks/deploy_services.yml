@@ -12,6 +12,7 @@
 #   9. apprise
 #   10. zabbix
 #   11. syncthing
+#   12. amneziawg
 
 - name: Deploy step_ca
   import_playbook: step_ca/deploy.yml
@@ -49,3 +50,6 @@
 
 - name: Deploy syncthing
   import_playbook: syncthing/deploy.yml
+
+- name: Deploy amneziawg
+  import_playbook: amneziawg/deploy.yml
