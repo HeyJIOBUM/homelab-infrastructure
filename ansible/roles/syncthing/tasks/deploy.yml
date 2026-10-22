@@ -78,6 +78,7 @@
     body_format: json
     body:
       globalAnnounceEnabled: false
+      localAnnounceEnabled: false
       relaysEnabled: false
       natEnabled: false
       crashReportingEnabled: false
