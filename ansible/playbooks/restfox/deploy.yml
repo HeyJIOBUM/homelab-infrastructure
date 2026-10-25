@@ -1,8 +1,8 @@
-- name: Deploy hoppscotch
+- name: Deploy restfox
   hosts: all
   become: yes
   tasks:
-    - name: Deploy hoppscotch
+    - name: Deploy restfox
       include_role:
-        name: hoppscotch
+        name: restfox
         tasks_from: deploy

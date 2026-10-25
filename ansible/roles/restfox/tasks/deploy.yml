@@ -1,0 +1,29 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+
+- name: Get restfox secrets
+  include_role:
+    name: restfox
+    tasks_from: read_vault_secrets
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ restfox_service_dir }}"
+    - "{{ restfox_data_dir }}"
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ restfox_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start restfox container
+  community.docker.docker_compose_v2:
+    project_src: "{{ restfox_service_dir }}"
+    state: present

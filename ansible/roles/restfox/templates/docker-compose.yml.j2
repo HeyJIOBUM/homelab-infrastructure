@@ -1,0 +1,30 @@
+services:
+  restfox:
+    image: flawiddsouza/restfox:{{ restfox_tag }}
+    container_name: restfox
+    restart: unless-stopped
+
+    volumes:
+      - "{{ restfox_data_dir }}:/app/data"
+
+    networks:
+      - {{ traefik_docker_network }}
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.restfox.rule=Host(`restfox.{{ technitium_dns_zone }}`)"
+      - "traefik.http.routers.restfox.entrypoints=websecure"
+      - "traefik.http.routers.restfox.tls.certresolver=stepca"
+      - "traefik.http.routers.restfox.middlewares=restfox-auth"
+      - "traefik.http.middlewares.restfox-auth.basicauth.users=admin:{{ restfox_admin_password | password_hash('bcrypt', salt=restfox_bcrypt_salt) | replace('$', '$$') }}"
+      - "traefik.http.services.restfox.loadbalancer.server.port=4004"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=Restfox"
+      - "homepage.description=Restfox"
+      - "homepage.icon=restfox.png"
+      - "homepage.href=https://restfox.{{ technitium_dns_zone }}"
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true

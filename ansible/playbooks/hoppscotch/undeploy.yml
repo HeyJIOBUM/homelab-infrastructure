@@ -1,8 +1,0 @@
-- name: Undeploy hoppscotch
-  hosts: all
-  become: yes
-  tasks:
-    - name: Undeploy hoppscotch
-      include_role:
-        name: hoppscotch
-        tasks_from: undeploy

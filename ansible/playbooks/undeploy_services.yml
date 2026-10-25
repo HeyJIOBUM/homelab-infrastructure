@@ -2,20 +2,24 @@
 #
 # Order:
 #   1. amneziawg
-#   2. syncthing
-#   3. zabbix
-#   4. apprise
-#   5. ittools
-#   6. garage
-#   7. homepage
-#   8. traefik
-#   9. dnsweaver
-#   10. technitium
-#   11. vault
-#   12. step_ca
+#   2. restfox
+#   3. syncthing
+#   4. zabbix
+#   5. apprise
+#   6. ittools
+#   7. garage
+#   8. homepage
+#   9. traefik
+#   10. dnsweaver
+#   11. technitium
+#   12. vault
+#   13. step_ca
 
 - name: Undeploy amneziawg
   import_playbook: amneziawg/undeploy.yml
+
+- name: Undeploy restfox
+  import_playbook: restfox/undeploy.yml
 
 - name: Undeploy syncthing
   import_playbook: syncthing/undeploy.yml

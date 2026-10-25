@@ -1,0 +1,15 @@
+# Dirs
+restfox_service_dir: "{{ services_path }}/restfox"
+restfox_data_dir: "{{ restfox_service_dir }}/data"
+
+# config
+restfox_tag: "0.41.0"
+
+restfox_bcrypt_salt: "{{ ansible_facts['machine_id'] | hash('sha256') | truncate(22, true, '') }}"
+
+# Vault
+restfox_vault_path: infra/restfox
+restfox_vault_secrets:
+  - ansible_name: restfox_admin_password
+    vault_name: admin_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"

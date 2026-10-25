@@ -1,0 +1,8 @@
+- name: Undeploy restfox
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy restfox
+      include_role:
+        name: restfox
+        tasks_from: undeploy
