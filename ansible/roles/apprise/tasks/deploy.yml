@@ -40,10 +40,11 @@
   community.docker.docker_compose_v2:
     project_src: "{{ apprise_service_dir }}"
     state: present
+    wait: true
 
 - name: Add apprise configurations
   uri:
-    url: "{{ apprise_addr }}/add/{{ apprise_config.config_id }}"
+    url: "http://127.0.0.1:{{ apprise_host_port }}/add/{{ apprise_config.config_id }}"
     method: POST
     url_username: "admin"
     url_password: "{{ apprise_admin_password }}"

@@ -1,3 +1,0 @@
-apprise_port: "8000"
-apprise_ip: "{{ hostvars['vps1'].ansible_host }}"
-apprise_addr: "http://{{ apprise_ip }}:{{ apprise_port }}"
