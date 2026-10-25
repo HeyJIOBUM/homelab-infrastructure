@@ -1,0 +1,17 @@
+# Dirs
+bytestash_service_dir: "{{ services_path }}/bytestash"
+bytestash_data_dir: "{{ bytestash_service_dir }}/data"
+
+# config
+bytestash_tag: "1.6.0"
+bytestash_port: "5005"
+
+# vault
+bytestash_vault_path: infra/bytestash
+bytestash_vault_secrets:
+  - ansible_name: bytestash_jwt_secret
+    vault_name: jwt_secret
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
+  - ansible_name: bytestash_admin_password
+    vault_name: admin_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"

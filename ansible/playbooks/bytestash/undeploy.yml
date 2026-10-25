@@ -1,0 +1,8 @@
+- name: Undeploy bytestash
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy bytestash
+      include_role:
+        name: bytestash
+        tasks_from: undeploy

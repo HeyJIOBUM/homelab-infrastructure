@@ -1,0 +1,47 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags: always
+
+- name: Get bytestash secrets
+  include_role:
+    name: bytestash
+    tasks_from: read_vault_secrets
+  tags: always
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ bytestash_service_dir }}"
+    - "{{ bytestash_data_dir }}"
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ bytestash_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start bytestash container
+  community.docker.docker_compose_v2:
+    project_src: "{{ bytestash_service_dir }}"
+    state: present
+
+- name: Generate admin user
+  uri:
+    url: "http://127.0.0.1:{{ bytestash_port }}/api/auth/register"
+    method: POST
+    body_format: json
+    body:
+      username: "admin"
+      password: "{{ bytestash_admin_password }}"
+    status_code: [200, 400]
+  register: admin_generate_result
+  failed_when: 
+    - admin_generate_result is failed
+    - "'Username already exists' not in admin_generate_result.json"
+  changed_when: "'Username already exists' not in (admin_generate_result.json.error | default(''))"
+  no_log: true

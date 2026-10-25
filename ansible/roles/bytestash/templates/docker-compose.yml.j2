@@ -1,0 +1,43 @@
+services:
+  bytestash:
+    image: ghcr.io/jordan-dalby/bytestash:{{ bytestash_tag }}
+    container_name: bytestash
+    restart: unless-stopped
+
+    environment:
+      JWT_SECRET: "{{ bytestash_jwt_secret }}"
+      BASE_PATH: ""
+      DEBUG: "true"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,bytestash.{{ technitium_dns_zone }}"
+      ADMIN_USERNAMES: "admin"
+      ALLOW_NEW_ACCOUNTS: "true"
+      DISABLE_ACCOUNTS: "false"
+      DISABLE_INTERNAL_ACCOUNTS: "false"
+      TOKEN_EXPIRY: "24h"
+      OIDC_ENABLED: "false"
+
+    ports:
+      - "127.0.0.1:{{ bytestash_port }}:5000"
+
+    volumes:
+      - "{{ bytestash_data_dir }}:/data/snippets"
+
+    networks:
+      - {{ traefik_docker_network }}
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bytestash.rule=Host(`bytestash.{{ technitium_dns_zone }}`)"
+      - "traefik.http.routers.bytestash.entrypoints=websecure"
+      - "traefik.http.routers.bytestash.tls.certresolver=stepca"
+      - "traefik.http.services.bytestash.loadbalancer.server.port=5000"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=bytestash"
+      - "homepage.description=bytestash"
+      - "homepage.icon=bytestash.png"
+      - "homepage.href=https://bytestash.{{ technitium_dns_zone }}"
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true
