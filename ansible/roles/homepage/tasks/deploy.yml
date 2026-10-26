@@ -8,6 +8,17 @@
     - "{{ homepage_config_dir }}"
     - "{{ homepage_icons_dir }}"
 
+- name: Download additional homepage icons
+  get_url:
+    url: "{{ additional_icon.url }}"
+    dest: "{{ homepage_icons_dir }}/{{ additional_icon.name }}"
+    mode: "0644"
+  loop: "{{ homepage_additional_icons | default([]) }}"
+  loop_control:
+    loop_var: additional_icon
+    label: "{{ additional_icon.name }}"
+  notify: restart homepage container
+
 - name: Create Homepage settings
   template:
     src: config/settings.yml.j2
