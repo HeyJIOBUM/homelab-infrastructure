@@ -17,7 +17,7 @@ services:
       OIDC_ENABLED: "false"
 
     ports:
-      - "127.0.0.1:{{ bytestash_port }}:5000"
+      - "127.0.0.1:{{ bytestash_host_port }}:5000"
 
     volumes:
       - "{{ bytestash_data_dir }}:/data/snippets"

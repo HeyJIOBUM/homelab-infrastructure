@@ -32,7 +32,7 @@
 
 - name: Generate admin user
   uri:
-    url: "http://127.0.0.1:{{ bytestash_port }}/api/auth/register"
+    url: "http://127.0.0.1:{{ bytestash_host_port }}/api/auth/register"
     method: POST
     body_format: json
     body:
