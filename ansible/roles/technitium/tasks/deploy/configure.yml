@@ -1,6 +1,6 @@
 - name: Login to technitium and obtain session token
   uri:
-    url: "{{ technitium_addr }}/api/user/login"
+    url: "http://127.0.0.1:{{ technitium_host_api_port }}/api/user/login"
     method: GET
     body_format: form-urlencoded
     body:
@@ -16,7 +16,7 @@
 
 - name: Validate api token
   uri:
-    url: "{{ technitium_addr }}/api/user/session/get"
+    url: "http://127.0.0.1:{{ technitium_host_api_port }}/api/user/session/get"
     method: GET
     headers:
       Authorization: "Bearer {{ technitium_api_token }}"
@@ -35,7 +35,7 @@
   block:
     - name: Create api token for dnsweaver
       uri:
-        url: "{{ technitium_addr }}/api/user/createToken"
+        url: "http://127.0.0.1:{{ technitium_host_api_port }}/api/user/createToken"
         method: GET
         headers:
           Authorization: "Bearer {{ technitium_login.json.token }}"
@@ -71,7 +71,7 @@
 
 - name: Create primary zone for homelab
   uri:
-    url: "{{ technitium_addr }}/api/zones/create"
+    url: "http://127.0.0.1:{{ technitium_host_api_port }}/api/zones/create"
     method: GET
     headers:
       Authorization: "Bearer {{ technitium_login.json.token }}"
@@ -87,7 +87,7 @@
 
 - name: Add docker network to dns acl
   uri:
-    url: "{{ technitium_addr }}/api/settings/set"
+    url: "http://127.0.0.1:{{ technitium_host_api_port }}/api/settings/set"
     method: GET
     headers:
       Authorization: "Bearer {{ technitium_login.json.token }}"
@@ -103,7 +103,7 @@
 
 - name: Enable ads block
   uri:
-    url: "{{ technitium_addr }}/api/settings/set"
+    url: "http://127.0.0.1:{{ technitium_host_api_port }}/api/settings/set"
     method: GET
     headers:
       Authorization: "Bearer {{ technitium_login.json.token }}"

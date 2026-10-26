@@ -7,7 +7,7 @@ services:
     environment:
       - DNSWEAVER_INSTANCES=internal-dns
       - DNSWEAVER_INTERNAL_DNS_TYPE=technitium
-      - DNSWEAVER_INTERNAL_DNS_URL={{ technitium_addr }}
+      - DNSWEAVER_INTERNAL_DNS_URL=http://technitium:5380
       - DNSWEAVER_INTERNAL_DNS_TOKEN_FILE={{ technitium_container_api_token_file }}
       - DNSWEAVER_INTERNAL_DNS_ZONE={{ technitium_dns_zone }}
       - DNSWEAVER_INTERNAL_DNS_RECORD_TYPE=A
