@@ -12,6 +12,9 @@ zabbix_image_tag: "{{ zabbix_version }}-latest"
 # Config
 zabbix_default_hostname: "vps1"
 
+zabbix_host_postgress_port: "5432"
+zabbix_host_web_port: "5050"
+
 # Vault
 zabbix_vault_path: infra/zabbix
 zabbix_vault_secrets:

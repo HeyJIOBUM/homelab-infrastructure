@@ -28,8 +28,7 @@
     line: "{{ item.key }}={{ item.value }}"
     backup: true
   loop:
-    - { key: "Server",       value: "{{ zabbix_ip }},{{ traefik_network_subnet }}" }
-    - { key: "ServerActive", value: "{{ zabbix_ip }}" }
+    - { key: "Server",       value: "{{ traefik_network_subnet }}" }
     - { key: "Hostname",     value: "{{ zabbix_default_hostname }}" }
   notify: restart zabbix-agent2
 

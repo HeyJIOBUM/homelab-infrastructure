@@ -5,7 +5,7 @@
 
 - name: Try to fetch Apprise media type
   uri:
-    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
       Content-Type: "application/json-rpc"
@@ -24,7 +24,7 @@
 
 - name: Create Apprise webhook media type if not exist
   uri:
-    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
       Content-Type: "application/json-rpc"
@@ -112,7 +112,7 @@
 
 - name: Get Zabbix Admin user
   uri:
-    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
       Content-Type: "application/json-rpc"
@@ -131,7 +131,7 @@
 
 - name: Attach Apprise media to Admin user
   uri:
-    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
       Content-Type: "application/json-rpc"
@@ -153,7 +153,7 @@
 
 - name: Create Zabbix action to send alerts via Apprise
   uri:
-    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
       Content-Type: "application/json-rpc"

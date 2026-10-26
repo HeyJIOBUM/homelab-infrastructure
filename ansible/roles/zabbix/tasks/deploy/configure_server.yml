@@ -1,6 +1,6 @@
 - name: Check if existing token is valid
   uri:
-    url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+    url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
       Content-Type: "application/json-rpc"
@@ -28,7 +28,7 @@
   block:
     - name: Login with default password
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -47,7 +47,7 @@
 
     - name: Change Admin password
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -69,7 +69,7 @@
 
     - name: Login with target password
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -88,7 +88,7 @@
 
     - name: Create API token
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -108,7 +108,7 @@
 
     - name: Generate API token
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -161,7 +161,7 @@
 
 - name: Get "Zabbix server" host
   uri:
-    url: "{{ zabbix_addr }}/api_jsonrpc.php"
+    url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
     method: POST
     headers:
       Content-Type: "application/json-rpc"
@@ -183,7 +183,7 @@
   block:
     - name: Get template ids
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -216,7 +216,7 @@
 
     - name: Get interface id
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -238,7 +238,7 @@
 
     - name: Unlink and clear all templates
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -258,7 +258,7 @@
 
     - name: Update agent interface
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -270,7 +270,7 @@
           params:
             interfaceid: "{{ zabbix_interface_id }}"
             useip: 1
-            ip: "{{ zabbix_ip }}"
+            ip: "{{ traefik_network_gateway  }}"
             dns: ""
             port: "10050"
           id: 13
@@ -280,7 +280,7 @@
 
     - name: Rename host
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"
@@ -299,7 +299,7 @@
 
     - name: Link templates
       uri:
-        url: "http://{{ zabbix_ip }}:{{ zabbix_web_port }}/api_jsonrpc.php"
+        url: "http://127.0.0.1:{{ zabbix_host_web_port }}/api_jsonrpc.php"
         method: POST
         headers:
           Content-Type: "application/json-rpc"

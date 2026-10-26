@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: zabbix
 
     ports:
-      - "127.0.0.1:{{ zabbix_postgress_port }}:5432"
+      - "127.0.0.1:{{ zabbix_host_postgress_port }}:5432"
 
     volumes:
       - "{{ zabbix_data_dir }}/postgres:/var/lib/postgresql/data"
@@ -75,7 +75,7 @@ services:
       POSTGRES_PASSWORD: "{{ zabbix_db_password }}"
 
     ports:
-      - "{{ zabbix_web_port }}:8080"
+      - "127.0.0.1:{{ zabbix_host_web_port }}:8080"
 
     networks:
       - {{ traefik_docker_network }}
