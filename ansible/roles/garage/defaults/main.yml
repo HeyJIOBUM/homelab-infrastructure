@@ -38,9 +38,6 @@ garage_vault_secrets:
     vault_name: admin_token
     generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"
 
-# service
-service_envs: ["dev", "server"] 
-
 #---------------------------------------------------------
 # UI image
 garage_ui_image_tag: "latest"

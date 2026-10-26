@@ -32,9 +32,6 @@ ansible_secret_id_ttl: "8760h"
 ansible_token_ttl: "1h"
 ansible_token_max_ttl: "4h"
 
-# service
-service_envs: ["dev", "server"] 
-
 # init_services_templates
 vault_init_roles: []
 vault_force_secrets_creation: false
