@@ -21,7 +21,7 @@
   command:
     cmd: >-
       step ca bootstrap
-      --ca-url https://localhost:{{ step_ca_api_port }}
+      --ca-url https://127.0.0.1:{{ step_ca_host_api_port }}
       --fingerprint {{ step_ca_fingerprint }}
       --force
   register: step_ca_bootstrap_result

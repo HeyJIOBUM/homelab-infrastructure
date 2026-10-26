@@ -37,9 +37,11 @@ step_ca_vault_secrets:
 # Config
 step_ca_image_tag: "0.30.2"
 
+step_ca_host_api_port: "9000"
+
 # Init
 step_ca_init_name: "Homelab Root CA"
-step_ca_init_dns_names: "step-ca,ca.{{ technitium_dns_zone }},localhost,127.0.0.1,{{ step_ca_ip }}"
+step_ca_init_dns_names: "step-ca,ca.{{ technitium_dns_zone }},localhost,127.0.0.1"
 step_ca_init_jwk_provisioner_name: "admin_jwk"
 step_ca_init_ssh: "false"
 
@@ -66,7 +68,6 @@ tls_renew_threshold: 604800
 tls_force_renew: false
 
 tls_not_after: "2160h"
-tls_step_ca_url: "{{ step_ca_addr }}"
 tls_step_ca_root: "{{ step_ca_root_ca_file }}"
 tls_step_ca_provisioner: "{{ step_ca_jwk_provisioner_name }}"
 tls_step_ca_provisioner_password_file: "{{ step_ca_jwk_password_file }}"

@@ -30,7 +30,7 @@ certificatesResolvers:
       tlsChallenge: {}
       email: "kirill.nichinger@gmail.com"
       storage: "/etc/traefik/acme.json"
-      caServer: "{{ step_ca_addr }}/acme/acme/directory"
+      caServer: "https://step-ca:9000/acme/acme/directory"
       caCertificates:
         - /etc/traefik/step_ca_root.crt
 

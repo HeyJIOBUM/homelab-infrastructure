@@ -45,7 +45,7 @@
         cmd: >-
           step ca certificate {{ tls_subject }}
           {{ tls_cert_file }} {{ tls_key_file }}
-          --ca-url {{ tls_step_ca_url }}
+          --ca-url https://127.0.0.1:{{ step_ca_host_api_port }}
           --root {{ tls_step_ca_root }}
           --provisioner {{ tls_step_ca_provisioner }}
           --provisioner-password-file {{ tls_step_ca_provisioner_password_file }}

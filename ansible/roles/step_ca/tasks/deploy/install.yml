@@ -43,7 +43,7 @@
 
 - name: Wait for Step-CA to be ready
   uri:
-    url: "https://localhost:{{ step_ca_api_port }}/health"
+    url: "https://127.0.0.1:{{ step_ca_host_api_port }}/health"
     validate_certs: false
     status_code: 200
   register: step_ca_health
