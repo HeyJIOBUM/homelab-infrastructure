@@ -10,10 +10,11 @@
 
 - name: Create S3 access key for {{ service_name }}
   occ_automation.garage.garage_key:
-    api_url: "{{ garage_api_url }}"
+    api_url: "http://127.0.0.1:{{ garage_host_admin_port }}"
     api_token: "{{ garage_admin_token }}"
     name: "{{ service_name }}-{{ item }}-key"
     allow_create_bucket: false
+  delegate_to: vps1
   register: garage_s3_key_results
   loop: "{{ service_envs }}"
   loop_control:
@@ -21,9 +22,10 @@
 
 - name: Create S3 bucket for {{ service_name }}
   occ_automation.garage.garage_bucket:
-    api_url: "{{ garage_api_url }}"
+    api_url: "http://127.0.0.1:{{ garage_host_admin_port }}"
     api_token: "{{ garage_admin_token }}"
     name: "{{ service_name }}-{{ item }}"
+  delegate_to: vps1
   register: garage_bucket_results
   loop: "{{ service_envs }}"
   loop_control:
@@ -31,13 +33,14 @@
 
 - name: Grant key access to the bucket
   occ_automation.garage.garage_bucket_key:
-    api_url: "{{ garage_api_url }}"
+    api_url: "http://127.0.0.1:{{ garage_host_admin_port }}"
     api_token: "{{ garage_admin_token }}"
     bucket_alias: "{{ garage_bucket_results.results[idx].bucket.global_aliases[0] }}"
     access_key_id: "{{ garage_s3_key_results.results[idx].key.access_key_id }}"
     read: true
     write: true
     owner: false
+  delegate_to: vps1
   loop: "{{ service_envs }}"
   loop_control:
     index_var: idx
@@ -54,7 +57,6 @@
       access_key_id: "{{ garage_s3_key_results.results[idx].key.access_key_id }}"
       secret_access_key: "{{ garage_s3_key_results.results[idx].key.secret_access_key }}"
       bucket_name: "{{ garage_bucket_results.results[idx].bucket.global_aliases[0] }}"
-  become: false
   loop: "{{ service_envs }}"
   loop_control:
     index_var: idx

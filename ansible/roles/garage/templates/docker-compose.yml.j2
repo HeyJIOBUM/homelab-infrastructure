@@ -5,10 +5,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "{{ garage_s3_port }}:{{ garage_s3_port }}"
-      - "{{ garage_rpc_port }}:{{ garage_rpc_port }}"
-      - "{{ garage_web_port }}:{{ garage_web_port }}"
-      - "{{ garage_admin_port }}:{{ garage_admin_port }}"
+      - "127.0.0.1:{{ garage_host_admin_port }}:{{ garage_admin_port }}"
 
     volumes:
       - "{{ garage_config_dir }}/garage.toml:/etc/garage.toml:ro"
@@ -50,9 +47,6 @@ services:
 
     environment:
       GARAGE_UI_GARAGE_ADMIN_TOKEN: "{{ garage_admin_token }}"
-
-    ports:
-      - "{{ garage_ui_port }}:{{ garage_ui_internal_port }}"
 
     volumes:
       - "{{ garage_config_dir }}/config.yaml:/app/config.yaml:ro"

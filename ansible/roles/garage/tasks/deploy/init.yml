@@ -1,6 +1,6 @@
 - name: Check if garage layout is initialized
   uri:
-    url: "{{ garage_api_url }}/v2/GetClusterHealth"
+    url: "http://127.0.0.1:{{ garage_host_admin_port }}/v2/GetClusterHealth"
     method: GET
     headers:
       Authorization: "Bearer {{ garage_admin_token }}"

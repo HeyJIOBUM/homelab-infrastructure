@@ -12,18 +12,17 @@ garage_rpc_secret_file: "{{ garage_credentials_dir }}/.garage-rpc-secret"
 garage_image_tag: "v2.4.1"
 
 # Ports
+garage_host_admin_port: 3903
+
 garage_s3_port: 3900
 garage_rpc_port: 3901
 garage_web_port: 3902
 garage_admin_port: 3903
 garage_ui_port: 3909
 
-# Addresses
-garage_s3_endpoint: "http://{{ ansible_host }}:{{ garage_s3_port }}"
-garage_api_url: "http://{{ ansible_host }}:{{ garage_admin_port }}"
+# Config
 garage_s3_region: "garage"
 
-# Single-node
 garage_replication_factor: 1
 garage_node_capacity: 5Gi
 garage_node_zone: dc1
