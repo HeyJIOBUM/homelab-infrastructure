@@ -22,16 +22,6 @@
     state: started
     enabled: true
 
-- name: Read server tunnel IP from installer config
-  shell: |
-    grep '^export AWG_TUNNEL_SUBNET=' /root/awg/awgsetup_cfg.init | cut -d"'" -f2 | cut -d'/' -f1
-  register: awg_server_ip_raw
-  changed_when: false
-
-- name: Set server tunnel IP fact
-  set_fact:
-    awg_server_ip: "{{ awg_server_ip_raw.stdout | trim }}"
-
 - name: Configure dns for new clients
   lineinfile:
     path: /root/awg/awgsetup_cfg.init
