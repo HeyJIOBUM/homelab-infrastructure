@@ -21,15 +21,15 @@
       - zabbix-agent2-plugin-postgresql
     state: present
 
-- name: Configure Zabbix agent
-  lineinfile:
-    path: /etc/zabbix/zabbix_agent2.conf
-    regexp: "^{{ item.key }}="
-    line: "{{ item.key }}={{ item.value }}"
-    backup: true
-  loop:
-    - { key: "Server",       value: "{{ traefik_network_subnet }}" }
-    - { key: "Hostname",     value: "{{ zabbix_default_hostname }}" }
+- name: Create zabbix-agent2 custom configuration
+  copy:
+    dest: /etc/zabbix/zabbix_agent2.d/custom.conf
+    content: |
+      # Managed by Ansible
+      Server={{ traefik_network_subnet }}
+      Hostname={{ zabbix_default_hostname }}
+      ListenIP={{ traefik_network_gateway }}
+    mode: "0644"
   notify: restart zabbix-agent2
 
 - name: Enable and start zabbix-agent2
