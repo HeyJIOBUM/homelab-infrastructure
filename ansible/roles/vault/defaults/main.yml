@@ -37,6 +37,7 @@ service_envs: ["dev", "server"]
 
 # init_services_templates
 vault_init_roles: []
+vault_force_secrets_creation: false
 
 vault_log_service_name: "not_set"
 vault_service_secrets: []
