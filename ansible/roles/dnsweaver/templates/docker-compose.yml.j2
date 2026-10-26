@@ -11,7 +11,7 @@ services:
       - DNSWEAVER_INTERNAL_DNS_TOKEN_FILE={{ technitium_container_api_token_file }}
       - DNSWEAVER_INTERNAL_DNS_ZONE={{ technitium_dns_zone }}
       - DNSWEAVER_INTERNAL_DNS_RECORD_TYPE=A
-      - DNSWEAVER_INTERNAL_DNS_TARGET={{ traefik_ip }}
+      - DNSWEAVER_INTERNAL_DNS_TARGET={{ awg_server_ip }}
       - DNSWEAVER_INTERNAL_DNS_DOMAINS=*.{{ technitium_dns_zone }}
 
     volumes:
