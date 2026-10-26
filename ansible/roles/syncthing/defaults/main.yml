@@ -9,9 +9,8 @@ syncthing_tag: "2.1.6"
 syncthing_user: "1000"
 syncthing_group: "1000"
 
-syncthing_gui_port: "8384"
-syncthing_sync_port: "22000"
-syncthing_discovery_port: "21027"
+syncthing_host_gui_port: "8384"
+syncthing_host_sync_port: "22000"
 
 syncthing_default_folders:
   - id: "keepass"

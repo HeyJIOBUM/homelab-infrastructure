@@ -42,7 +42,7 @@
 
 - name: Set gui user and password
   uri:
-    url: "http://127.0.0.1:{{ syncthing_gui_port }}/rest/config/gui"
+    url: "http://127.0.0.1:{{ syncthing_host_gui_port }}/rest/config/gui"
     method: PATCH
     headers:
       X-API-Key: "{{ syncthing_api_key }}"
@@ -56,7 +56,7 @@
 - name: Add keepass folders
   shell: >- 
     docker exec syncthing syncthing cli 
-    --gui-address=127.0.0.1:{{ syncthing_gui_port }} --gui-apikey={{ syncthing_api_key }} 
+    --gui-address=127.0.0.1:{{ syncthing_host_gui_port }} --gui-apikey={{ syncthing_api_key }} 
     config folders add --id {{ folder.id }} --label {{ folder.label }} --path {{ folder.path }}
   loop: "{{ syncthing_default_folders }}"
   loop_control:
@@ -71,7 +71,7 @@
 
 - name: Configure syncthing options
   uri:
-    url: "http://127.0.0.1:{{ syncthing_gui_port }}/rest/config/options"
+    url: "http://127.0.0.1:{{ syncthing_host_gui_port }}/rest/config/options"
     method: PATCH
     headers:
       X-API-Key: "{{ syncthing_api_key }}"

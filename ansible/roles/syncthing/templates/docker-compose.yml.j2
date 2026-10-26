@@ -10,9 +10,9 @@ services:
       - STGUIAPIKEY={{ syncthing_api_key }}
 
     ports:
-      - "{{ syncthing_gui_port }}:8384"
-      - "{{ syncthing_sync_port }}:22000"
-      - "{{ syncthing_discovery_port }}:21027"
+      - "127.0.0.1:{{ syncthing_host_gui_port }}:8384"
+      - "{{ awg_server_ip }}:{{ syncthing_host_sync_port }}:22000/tcp"
+      - "{{ awg_server_ip }}:{{ syncthing_host_sync_port }}:22000/udp"
 
     volumes:
       - "{{ syncthing_data_dir }}:/data"
