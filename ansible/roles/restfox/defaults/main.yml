@@ -5,8 +5,6 @@ restfox_data_dir: "{{ restfox_service_dir }}/data"
 # config
 restfox_tag: "0.41.0"
 
-restfox_bcrypt_salt: "{{ ansible_facts['machine_id'] | hash('sha256') | truncate(22, true, '') }}"
-
 # Vault
 restfox_vault_path: infra/restfox
 restfox_vault_secrets:

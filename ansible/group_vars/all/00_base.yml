@@ -6,3 +6,5 @@ ansible_python_interpreter: "{{ ansible_venv_path }}/bin/python"
 timezone: "Europe/Minsk"
 
 service_envs: ["dev", "server"]
+
+stable_bcrypt_salt: "{{ ansible_facts['machine_id'] | hash('sha256') | truncate(22, true, '') }}"
