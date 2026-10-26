@@ -13,7 +13,7 @@ vault_tls_cert: "{{ vault_tls_dir }}/vault.crt"
 vault_tls_key: "{{ vault_tls_dir }}/vault.key"
 
 # vault config
-vault_api_port: 8201
+vault_cluster_port: 8201
 
 vault_image_tag: 2.1.0
 vault_ui_enabled: "true"
@@ -22,6 +22,16 @@ vault_disable_mlock: "true"
 # init
 vault_key_shares: 5
 vault_key_threshold: 3
+
+# tls
+vault_tls_san:
+  - "vault.{{ technitium_dns_zone }}"
+  - "vault"
+  - "localhost"
+  - "127.0.0.1"
+  - "{{ ansible_facts.default_ipv4.address }}"
+vault_tls_owner: "100"
+vault_tls_group: "100"
 
 # secret
 service_secret_ttl: "8760h"
@@ -39,3 +49,8 @@ vault_force_secrets_creation: false
 vault_log_service_name: "not_set"
 vault_service_secrets: []
 vault_service_secrets_path: ""
+
+# service
+service_vault_addr_by_env:
+  dev: "https://10.9.0.1:8200"
+  server: "https://vault:8200"

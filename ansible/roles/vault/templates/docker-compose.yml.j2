@@ -8,12 +8,13 @@ services:
       - IPC_LOCK
     
     environment:
-      - VAULT_ADDR={{ vault_proto }}://127.0.0.1:{{ vault_port }}
-      - VAULT_CLUSTER_ADDR={{ vault_proto }}://127.0.0.1:{{ vault_api_port }}
+      - VAULT_ADDR={{ vault_proto }}://127.0.0.1:{{ vault_web_port }}
+      - VAULT_CLUSTER_ADDR={{ vault_proto }}://127.0.0.1:{{ vault_cluster_port }}
       - VAULT_SKIP_VERIFY=true
     
     ports:
-      - "{{ vault_port }}:{{ vault_port }}"
+      - "127.0.0.1:{{ vault_host_web_port }}:{{ vault_web_port }}"
+      - "{{ awg_server_ip }}:{{ vault_host_web_port }}:{{ vault_web_port }}"
 
     volumes:
       - {{ vault_config_dir }}:/vault/config:ro
@@ -28,7 +29,7 @@ services:
       - "traefik.http.routers.vault.rule=Host(`vault.{{ technitium_dns_zone }}`)"
       - "traefik.http.routers.vault.entrypoints=websecure"
       - "traefik.http.routers.vault.tls.certresolver=stepca"
-      - "traefik.http.services.vault.loadbalancer.server.port={{ vault_port }}"
+      - "traefik.http.services.vault.loadbalancer.server.port={{ vault_web_port }}"
       - "traefik.http.services.vault.loadbalancer.server.scheme={{ vault_proto }}"
       - "traefik.http.services.vault.loadBalancer.serversTransport=stepca@file"
 

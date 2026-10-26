@@ -156,6 +156,7 @@
         engine_mount_point: "{{ vault_kv_engine }}"
         path: "{{ zabbix_vault_path }}"
         data: "{{ zabbix_vault_data }}"
+      delegate_to: vps1
       no_log: true
 
 - name: Get "Zabbix server" host

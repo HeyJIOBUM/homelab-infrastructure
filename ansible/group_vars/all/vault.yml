@@ -3,9 +3,10 @@ vault_kv_engine: "secret"
 vault_tls_disable: "false"
 vault_proto: "{{ 'http' if vault_tls_disable | bool else 'https' }}"
 
-vault_port: "8200"
-vault_ip: "{{ hostvars['vps1'].ansible_host }}"
-vault_addr: "{{ vault_proto }}://{{ vault_ip }}:{{ vault_port }}"
+vault_host_web_port: "8200"
+vault_web_port: "8200"
+
+vault_addr: "{{ vault_proto }}://127.0.0.1:{{ vault_host_web_port }}"
 
 vault_admin_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256

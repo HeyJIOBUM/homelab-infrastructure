@@ -40,6 +40,7 @@
   uri:
     url: "{{ vault_addr }}/v1/sys/health"
     status_code: [200, 501, 503]
+  delegate_to: vps1
   register: health
   until: health.status in [200, 501, 503]
   retries: 10

@@ -1,8 +1,6 @@
 - name: Add service to Vault
   hosts: all
   become: yes
-  environment:
-    VAULT_ADDR: "{{ vault_addr }}"
   pre_tasks:
     - name: Preflight checks
       include_role:

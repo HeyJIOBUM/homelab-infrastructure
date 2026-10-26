@@ -68,6 +68,7 @@
         engine_mount_point: "{{ vault_kv_engine }}"
         path: "{{ technitium_vault_path }}"
         data: "{{ technitium_vault_data }}"
+      delegate_to: vps1
 
 - name: Create primary zone for homelab
   uri:

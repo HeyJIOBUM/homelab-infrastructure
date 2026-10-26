@@ -95,6 +95,7 @@
     index_var: idx
     label: "{{ service_name }}.{{ item }}.env"
   vars:
+    service_vault_addr: "{{ service_vault_addr_by_env[item] }}"
     role_id:   "{{ role_id_results.results[idx].stdout   | trim }}"
     secret_id: "{{ secret_id_results.results[idx].stdout | trim }}"
     env:       "{{ item }}"

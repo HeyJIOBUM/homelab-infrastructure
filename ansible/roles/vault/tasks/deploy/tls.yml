@@ -7,10 +7,6 @@
     tls_dir: "{{ vault_tls_dir }}"
     tls_cert_file: "{{ vault_tls_cert }}"
     tls_key_file: "{{ vault_tls_key }}"
-    tls_san:
-      - "vault.{{ technitium_dns_zone }}"
-      - "vault"
-      - "localhost"
-      - "{{ ansible_facts.default_ipv4.address }}"
-    tls_owner: "100"
-    tls_group: "100"
+    tls_san: "{{ vault_tls_san }}"
+    tls_owner: "{{ vault_tls_owner }}"
+    tls_group: "{{ vault_tls_group }}"

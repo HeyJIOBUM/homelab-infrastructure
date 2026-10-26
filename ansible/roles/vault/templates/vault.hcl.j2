@@ -4,7 +4,7 @@ storage "raft" {
 }
 
 listener "tcp" {
-  address     = "0.0.0.0:{{ vault_port }}"
+  address     = "0.0.0.0:{{ vault_web_port }}"
   tls_disable = {{ vault_tls_disable }}
 {% if vault_tls_disable | bool == false %}
   tls_cert_file = "/vault/tls/vault.crt"
@@ -14,7 +14,7 @@ listener "tcp" {
 
 ui = {{ vault_ui_enabled }}
 
-api_addr     = "{{ vault_proto }}://0.0.0.0:{{ vault_port }}"
-cluster_addr = "{{ vault_proto }}://0.0.0.0:{{ vault_api_port }}"
+api_addr     = "{{ vault_proto }}://0.0.0.0:{{ vault_web_port }}"
+cluster_addr = "{{ vault_proto }}://0.0.0.0:{{ vault_cluster_port }}"
 
 disable_mlock = {{ vault_disable_mlock | default('true') }}
