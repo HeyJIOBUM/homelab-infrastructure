@@ -14,7 +14,8 @@
 #   11. syncthing
 #   12. restfox
 #   13. bytestash
-#   14. amneziawg
+#   14. vaultwarden
+#   15. amneziawg
 
 - name: Deploy step_ca
   import_playbook: step_ca/deploy.yml
@@ -58,6 +59,9 @@
 
 - name: Deploy bytestash
   import_playbook: bytestash/deploy.yml
+
+- name: Deploy vaultwarden
+  import_playbook: vaultwarden/deploy.yml
 
 - name: Deploy amneziawg
   import_playbook: amneziawg/deploy.yml

@@ -1,0 +1,31 @@
+- name: Login to vault
+  include_role:
+    name: vault
+    tasks_from: login
+  tags: always
+
+- name: Get vaultwarden secrets
+  include_role:
+    name: vaultwarden
+    tasks_from: read_vault_secrets
+  tags: always
+
+- name: Create vaultwarden directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ vaultwarden_service_dir }}"
+    - "{{ vaultwarden_data_dir }}"
+
+- name: Create Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ vaultwarden_service_dir }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Start vaultwarden container
+  community.docker.docker_compose_v2:
+    project_src: "{{ vaultwarden_service_dir }}"
+    state: present

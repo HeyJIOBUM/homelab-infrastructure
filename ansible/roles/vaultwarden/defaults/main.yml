@@ -1,0 +1,13 @@
+# Dirs
+vaultwarden_service_dir: "{{ services_path }}/vaultwarden"
+vaultwarden_data_dir: "{{ vaultwarden_service_dir }}/data"
+
+# Config
+vaultwarden_tag: "1.37.5"
+
+# vault
+vaultwarden_vault_path: infra/vaultwarden
+vaultwarden_vault_secrets:
+  - ansible_name: vaultwarden_admin_token
+    vault_name: admin_token
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"

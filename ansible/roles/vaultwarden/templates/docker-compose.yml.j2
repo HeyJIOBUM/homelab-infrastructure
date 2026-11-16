@@ -1,0 +1,33 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:{{ vaultwarden_tag }}
+    container_name: vaultwarden
+    restart: unless-stopped
+
+    environment:
+      - ADMIN_TOKEN={{ vaultwarden_admin_token }}
+      - DOMAIN=https://vaultwarden.{{ technitium_dns_zone }}
+      - SIGNUPS_ALLOWED=false
+
+    volumes:
+      - {{ vaultwarden_data_dir }}:/data
+
+    networks:
+      - {{ traefik_docker_network }}
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.{{ technitium_dns_zone }}`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=stepca"
+      - "traefik.http.services.vaultwarden.loadbalancer.server.port=80"
+
+      - "homepage.group=Infrastructure"
+      - "homepage.name=vaultwarden"
+      - "homepage.description=Vaultwarden"
+      - "homepage.icon=vaultwarden.png"
+      - "homepage.href=https://vaultwarden.{{ technitium_dns_zone }}"
+
+networks:
+  {{ traefik_docker_network }}:
+    external: true

@@ -1,0 +1,18 @@
+- name: Check if vaultwarden compose file exists
+  stat:
+    path: "{{ vaultwarden_service_dir }}/docker-compose.yml"
+  register: vaultwarden_compose
+
+- name: Stop vaultwarden container
+  community.docker.docker_compose_v2:
+    project_src: "{{ vaultwarden_service_dir }}"
+    state: absent
+  when:
+    - undeploy_levels[undeploy_level] >= undeploy_levels.stop
+    - vaultwarden_compose.stat.exists
+
+- name: Remove vaultwarden service directory
+  file:
+    path: "{{ vaultwarden_service_dir }}"
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.wipe
