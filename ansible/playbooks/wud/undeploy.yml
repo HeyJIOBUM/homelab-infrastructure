@@ -1,0 +1,8 @@
+- name: Undeploy wud
+  hosts: all
+  become: yes
+  tasks:
+    - name: Undeploy wud
+      include_role:
+        name: wud
+        tasks_from: undeploy

@@ -1,0 +1,13 @@
+# Dirs
+wud_service_dir: "{{ services_path }}/wud"
+wud_data_dir: "{{ wud_service_dir }}/data"
+
+# config
+wud_tag: "9.8.0"
+
+# vault
+wud_vault_path: infra/wud
+wud_vault_secrets:
+  - ansible_name: wud_admin_password
+    vault_name: admin_password
+    generator: "{{ lookup('pipe', 'openssl rand -hex 32') }}"

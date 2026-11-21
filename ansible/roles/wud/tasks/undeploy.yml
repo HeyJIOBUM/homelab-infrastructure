@@ -1,0 +1,18 @@
+- name: Check if wud compose file exists
+  stat:
+    path: "{{ wud_service_dir }}/docker-compose.yml"
+  register: wud_compose
+
+- name: Stop wud container
+  community.docker.docker_compose_v2:
+    project_src: "{{ wud_service_dir }}"
+    state: absent
+  when:
+    - undeploy_levels[undeploy_level] >= undeploy_levels.stop
+    - wud_compose.stat.exists
+
+- name: Remove wud service directory
+  file:
+    path: "{{ wud_service_dir }}"
+    state: absent
+  when: undeploy_levels[undeploy_level] >= undeploy_levels.wipe

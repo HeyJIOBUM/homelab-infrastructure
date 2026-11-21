@@ -1,0 +1,8 @@
+- name: Deploy wud
+  hosts: all
+  become: yes
+  tasks:
+    - name: Deploy wud
+      include_role:
+        name: wud
+        tasks_from: deploy

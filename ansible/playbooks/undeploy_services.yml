@@ -2,23 +2,27 @@
 #
 # Order:
 #   1. amneziawg
-#   2. vaultwarden
-#   3. bytestash
-#   4. restfox
-#   5. syncthing
-#   6. zabbix
-#   7. apprise
-#   8. ittools
-#   9. garage
-#   10. homepage
-#   11. traefik
-#   12. dnsweaver
-#   13. technitium
-#   14. vault
-#   15. step_ca
+#   2. wud
+#   3. vaultwarden
+#   4. bytestash
+#   5. restfox
+#   6. syncthing
+#   7. zabbix
+#   8. apprise
+#   9. ittools
+#   10. garage
+#   11. homepage
+#   12. traefik
+#   13. dnsweaver
+#   14. technitium
+#   15. vault
+#   16. step_ca
 
 - name: Undeploy amneziawg
   import_playbook: amneziawg/undeploy.yml
+
+- name: Undeploy wud
+  import_playbook: wud/undeploy.yml
 
 - name: Undeploy vaultwarden
   import_playbook: vaultwarden/undeploy.yml
